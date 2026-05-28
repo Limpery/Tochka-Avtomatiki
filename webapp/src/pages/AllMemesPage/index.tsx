@@ -15,7 +15,7 @@ export const AllMemesPage = () => {
     <div>
       <h1>All Memes</h1>
       <div>
-        {data.memes.map((mem) => {
+        {data?.memes.map((mem) => {
           return (
             <div key={mem.id}>
               <h2>{mem.title}</h2>

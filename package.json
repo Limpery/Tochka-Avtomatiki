@@ -1,5 +1,19 @@
 {
     "name": "memmemory",
     "private": true,
-    "version": "0.0.0"
+    "version": "0.0.0",
+    "scripts": {
+        "b": "pnpm --filter @memmemory/backend",
+        "w": "pnpm --filter @memmemory/webapp",
+        "dev": "pnpm -r --parallel dev",
+        "types": "concurrently 'pnpm b types' 'pnpm w types'",
+        "prettify": "pnpm -r --parallel prettify"
+    },
+    "devDependencies": {
+        "concurrently": "^9.2.1",
+        "prettier": "^3.8.3",
+        "rimraf": "^6.1.3",
+        "ts-node": "^10.9.2",
+        "typescript": "^6.0.3"
+    }
 }

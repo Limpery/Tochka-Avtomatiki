@@ -12,6 +12,12 @@
         "prettify": "pnpm -r --parallel prettify",
         "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'"
     },
+    "lint-staged": {
+        "{webapp,backend}/src/**/*.{ts,tsx,js,jsx}": [
+            "sh -c 'pnpm run lint:fix'",
+            "sh -c 'pnpm run types'"
+            ]
+    },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
         "concurrently": "^9.2.1",

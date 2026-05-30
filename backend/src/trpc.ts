@@ -28,7 +28,6 @@ const memes = [
   },
 ]
 
-const x: number = "1fsaf"
 
 const trpc = initTRPC.create()
 

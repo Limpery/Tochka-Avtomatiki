@@ -31,9 +31,7 @@ const memes = [
 const trpc = initTRPC.create()
 
 export const trpcRouter = trpc.router({
-  getMemes: trpc.procedure.query(() => {
-    return { memes }
-  }),
+  getMemes: trpc.procedure.query(() => ({ memes })),
 })
 
 export type TrpcRouter = typeof trpcRouter

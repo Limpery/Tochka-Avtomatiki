@@ -15,14 +15,12 @@ export const AllMemesPage = () => {
     <div>
       <h1>All Memes</h1>
       <div>
-        {data?.memes.map((mem) => {
-          return (
+        {data?.memes.map((mem) => (
             <div key={mem.id}>
               <h2>{mem.title}</h2>
               <p>{mem.description}</p>
             </div>
-          )
-        })}
+          ))}
       </div>
     </div>
   )

@@ -1,37 +1,31 @@
 {
-    "name": "memmemory",
-    "private": true,
-    "version": "0.0.0",
-    "scripts": {
-        "b": "pnpm --filter @memmemory/backend",
-        "w": "pnpm --filter @memmemory/webapp",
-        "dev": "pnpm -r --parallel dev",
-        "types": "concurrently 'pnpm b types' 'pnpm w types'",
-        "lint": "concurrently 'pnpm b lint' 'pnpm w lint'",
-        "lint:fix": "concurrently 'pnpm b lint --fix' 'pnpm w lint --fix'",
-        "prettify": "pnpm -r --parallel prettify",
-        "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'"
-    },
-    "lint-staged": {
-        "{webapp,backend}/src/**/*.{ts,tsx,js,jsx}": [
-            "sh -c 'pnpm run lint:fix'",
-            "sh -c 'pnpm run types'"
-            ]
-    },
-    "devDependencies": {
-        "@eslint/js": "^10.0.1",
-        "concurrently": "^9.2.1",
-        "eslint": "^10.4.0",
-        "eslint-config-love": "^154.0.0",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-react-hooks": "^7.1.1",
-        "eslint-plugin-react-refresh": "^0.5.2",
-        "globals": "^17.6.0",
-        "lint-staged": "^17.0.5",
-        "prettier": "^3.8.3",
-        "rimraf": "^6.1.3",
-        "ts-node": "^10.9.2",
-        "typescript": "^6.0.3",
-        "typescript-eslint": "^8.60.0"
-    }
+  "name": "memmemory",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "b": "pnpm --filter @memmemory/backend",
+    "w": "pnpm --filter @memmemory/webapp",
+    "dev": "pnpm -r --parallel dev",
+    "types": "concurrently 'pnpm b types' 'pnpm w types'",
+    "lint": "concurrently 'pnpm b lint' 'pnpm w lint'",
+    "lint:fix": "concurrently 'pnpm b lint --fix' 'pnpm w lint --fix'",
+    "prettify": "pnpm -r --parallel prettify",
+    "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.4.0",
+    "eslint-config-love": "^154.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "lint-staged": "^17.0.5",
+    "prettier": "^3.8.3",
+    "rimraf": "^6.1.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.0"
+  }
 }

@@ -10,7 +10,8 @@
     "lint": "concurrently 'pnpm b lint' 'pnpm w lint'",
     "lint:fix": "concurrently 'pnpm b lint --fix' 'pnpm w lint --fix'",
     "prettify": "pnpm -r --parallel prettify",
-    "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'"
+    "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'",
+    "setup-hooks": "node -e \"const fs=require('fs'); fs.copyFileSync('scripts/commit-msg-hook.js', '.git/hooks/commit-msg'); require('child_process').execSync('chmod +x .git/hooks/commit-msg', {stdio: 'ignore'}); console.log('Git hooks installed!')\""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

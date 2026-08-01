@@ -1,6 +1,7 @@
 import { getViewMemeRoute } from '../../lib/routes'
 import { trpc } from '../../lib/trpc'
 import { Link } from 'react-router-dom'
+import css from './index.module.scss'
 
 export const AllMemesPage = () => {
   const { data, error, isLoading, isFetching, isError } = trpc.getMemes.useQuery()
@@ -15,14 +16,16 @@ export const AllMemesPage = () => {
 
   return (
     <div>
-      <h1>All Memes</h1>
-      <div>
+      <h1 className={css.title}>All Memes</h1>
+      <div className={css.memes}>
         {data?.memes.map((mem) => (
-          <div key={mem.name}>
-            <h2>
-              <Link to={getViewMemeRoute(mem.name)}>{mem.title}</Link>
+          <div className={css.mem} key={mem.name}>
+            <h2 className={css.memName}>
+              <Link className={css.memLink} to={getViewMemeRoute(mem.name)}>
+                {mem.title}
+              </Link>
             </h2>
-            <p>{mem.description}</p>
+            <p className={css.memDescription}>{mem.description}</p>
           </div>
         ))}
       </div>

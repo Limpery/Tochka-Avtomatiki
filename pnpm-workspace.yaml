@@ -1,3 +1,6 @@
 packages:
- - backend
- - webapp
+  - backend
+  - webapp
+allowBuilds:
+  '@parcel/watcher': false
+  loodash: set this to true or false

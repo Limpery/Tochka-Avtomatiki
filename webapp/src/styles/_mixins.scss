@@ -1,0 +1,24 @@
+@forward '../../node_modules/include-media/dist/_include-media.scss';
+@use './vars' as *;
+
+@mixin link($color: $blue, $hoverColor: $red) {
+  color: $color;
+  transition: color 0.2s ease-in-out;
+  &:hover,
+  &:active {
+    color: $hoverColor;
+    transition: none;
+  }
+}
+
+@mixin h1 {
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+@mixin h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 7px;
+}

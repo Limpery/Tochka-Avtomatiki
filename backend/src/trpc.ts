@@ -1,37 +1,28 @@
 import { initTRPC } from '@trpc/server'
+import _ from 'lodash'
+import z from 'zod'
 
-const memes = [
-  {
-    name: "mem-name-1",
-    title: 'Mem 1',
-    description: 'Description 1 ...',
-  },
-  {
-    name: "mem-name-2",
-    title: 'Mem 2',
-    description: 'Description 2 ...',
-  },
-  {
-    name: "mem-name-3",
-    title: 'Mem 3',
-    description: 'Description 3 ...',
-  },
-  {
-    name: "mem-name-4",
-    title: 'Mem 4',
-    description: 'Description 4 ...',
-  },
-  {
-    name: "mem-name-5",
-    title: 'Mem 5',
-    description: 'Description 5 ...',
-  },
-]
+const memes = _.times(100, (i) => ({
+  name: `mem-name-${i}`,
+  title: `Mem ${i}`,
+  description: `Description ${i} ...`,
+  text: _.times(100, (j) => `<p>Text paragraph ${j} of mem ${i}</p>`).join(''),
+}))
 
 const trpc = initTRPC.create()
 
 export const trpcRouter = trpc.router({
-  getMemes: trpc.procedure.query(() => ({ memes })),
+  getMemes: trpc.procedure.query(() => ({ memes: memes.map((mem) => _.pick(mem, ['name', 'title', 'description'])) })),
+  getMem: trpc.procedure
+    .input(
+      z.object({
+        nameMem: z.string(),
+      }),
+    )
+    .query(({ input }) => {
+      const mem = memes.find((mem) => mem.name === input.nameMem)
+      return { mem: mem || null }
+    }),
 })
 
 export type TrpcRouter = typeof trpcRouter

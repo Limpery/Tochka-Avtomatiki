@@ -1,0 +1,16 @@
+@use '../../styles/vars' as *;
+@use '../../styles/mixins' as *;
+.title {
+  @include h1;
+  margin-bottom: 2px;
+}
+.description {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+.text {
+  font-size: 14px;
+  & > *:not(:first-child) {
+    margin-top: 10px;
+  }
+}

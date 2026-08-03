@@ -1,24 +1,18 @@
-@use '../../styles/vars' as *;
-@use '../../styles/mixins' as *;
-.title {
-  @include h1;
-}
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
 .memes {
   .mem {
     padding: 20px;
     border: 1px solid $black;
     border-radius: 10px;
+
     & + .mem {
       margin-top: 20px;
     }
-    .memName {
-      @include h2;
-      .memLink {
-        @include link;
-      }
-    }
-    .memDescription {
-      font-size: 18px;
+
+    .memLink {
+      @include link;
     }
   }
 }

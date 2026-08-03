@@ -17,4 +17,7 @@ export default {
 
   // Корневые конфиги, утилиты, скрипты
   '*.{ts,js,mjs,json,yml}': 'prettier --loglevel warn --cache --write',
+
+
+  '*.scss': 'stylelint --cache --cache-location ./node_modules/.cache/stylelintcache --fix'
 }

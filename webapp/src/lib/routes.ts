@@ -6,3 +6,6 @@ export const getAllMemesRoute = () => '/'
 export const viewMemeRouteParams = getRouteParams({ nameMem: true })
 export type ViewMemeRouteParams = typeof viewMemeRouteParams
 export const getViewMemeRoute = (nameMem: string) => `/memes/${nameMem}`
+
+
+export const getNewMemeRoute = () => '/memes/new'

@@ -21,7 +21,7 @@ export default {
   'backend/**/*.{json,mjs,yml}': 'prettier --log-level warn --cache --write',
 
   // Корневые конфиги, утилиты, скрипты
-  '*.{ts,js,mjs,json,yml}': 'prettier --cache --write',
+  '*.{ts,js,mjs,json,yml}': 'prettier --log-level warn --cache --write',
 
   // SCSS: берём stylelint из webapp, в корень ничего не ставим
   'webapp/**/*.scss': [

@@ -47,7 +47,7 @@ export const NewMemPage = () => {
       >
         <Input name="name" label="Name" formik={formik} />
         <Input name="title" label="Title" formik={formik} />
-        <Input name="description" label="Description" formik={formik} />
+        <Input name="description" label="Description" formik={formik} maxWidth={500}/>
         <Textarea name="text" label="Text" formik={formik} />
         {!formik.isValid && !!formik.submitCount && <div style={{ color: 'red' }}>Some fields are invalid</div>}
         {!!submittingError && <div style={{ color: 'red' }}>Error: {submittingError}</div>}

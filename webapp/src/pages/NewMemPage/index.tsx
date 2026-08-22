@@ -9,6 +9,7 @@ import { useState } from 'react'
 
 export const NewMemPage = () => {
   const [succesMessageVisible, setSuccessMessageVisible] = useState(false)
+  const [submittingError, setSubmittingError] = useState<string | null>(null)
   const createMem = trpc.createMem.useMutation()
   const formik = useFormik({
     initialValues: {
@@ -19,12 +20,20 @@ export const NewMemPage = () => {
     },
     validate: withZodSchema(zCreateMemTrpcInput),
     onSubmit: async (values) => {
-      await createMem.mutateAsync(values)
-      formik.resetForm()
-      setSuccessMessageVisible(true)
-      setTimeout(() => {
-        setSuccessMessageVisible(false)
-      }, 3000)
+      try {
+        await createMem.mutateAsync(values)
+        formik.resetForm()
+        setSuccessMessageVisible(true)
+        setTimeout(() => {
+          setSuccessMessageVisible(false)
+        }, 3000)
+      } catch (error: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        setSubmittingError(error.message)
+        setTimeout(() => {
+          setSubmittingError(null)
+        }, 3000)
+      }
     },
   })
 
@@ -41,6 +50,7 @@ export const NewMemPage = () => {
         <Input name="description" label="Description" formik={formik} />
         <Textarea name="text" label="Text" formik={formik} />
         {!formik.isValid && !!formik.submitCount && <div style={{ color: 'red' }}>Some fields are invalid</div>}
+        {!!submittingError && <div style={{ color: 'red' }}>Error: {submittingError}</div>}
         {succesMessageVisible && <div style={{ color: 'green' }}>Mem created</div>}
         <button type="submit" disabled={formik.isSubmitting}>
           {formik.isSubmitting ? 'Submitting...' : 'Create Mem'}

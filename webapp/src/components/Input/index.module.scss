@@ -13,7 +13,7 @@
     display: block;
     padding: 7px;
     border: 1px solid $black;
-    border-radius: 3px;
+    border-radius: $borderRadiusSmall;
     background-color: $white;
     outline: none;
     width: 100%;

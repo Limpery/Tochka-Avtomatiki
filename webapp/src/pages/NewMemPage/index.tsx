@@ -6,6 +6,9 @@ import { Textarea } from '../../components/Textarea'
 import { withZodSchema } from 'formik-validator-zod'
 import { trpc } from '../../lib/trpc'
 import { useState } from 'react'
+import { Alert } from '../../components/Alert'
+import { Button } from '../../components/Button'
+import { FormItems } from '../../components/FormItems'
 
 export const NewMemPage = () => {
   const [succesMessageVisible, setSuccessMessageVisible] = useState(false)
@@ -45,16 +48,16 @@ export const NewMemPage = () => {
           formik.handleSubmit()
         }}
       >
-        <Input name="name" label="Name" formik={formik} />
-        <Input name="title" label="Title" formik={formik} />
-        <Input name="description" label="Description" formik={formik} maxWidth={500}/>
-        <Textarea name="text" label="Text" formik={formik} />
-        {!formik.isValid && !!formik.submitCount && <div style={{ color: 'red' }}>Some fields are invalid</div>}
-        {!!submittingError && <div style={{ color: 'red' }}>Error: {submittingError}</div>}
-        {succesMessageVisible && <div style={{ color: 'green' }}>Mem created</div>}
-        <button type="submit" disabled={formik.isSubmitting}>
-          {formik.isSubmitting ? 'Submitting...' : 'Create Mem'}
-        </button>
+        <FormItems>
+          <Input name="name" label="Name" formik={formik} />
+          <Input name="title" label="Title" formik={formik} />
+          <Input name="description" label="Description" formik={formik} maxWidth={500} />
+          <Textarea name="text" label="Text" formik={formik} />
+          {!formik.isValid && !!formik.submitCount && <div style={{ color: 'red' }}>Some fields are invalid</div>}
+          {!!submittingError && <Alert color={'red'}>Error: {submittingError}</Alert>}
+          {succesMessageVisible && <Alert color={'green'}>Mem created</Alert>}
+          <Button loading={formik.isSubmitting}>Create Mem </Button>
+        </FormItems>
       </form>
     </Segment>
   )

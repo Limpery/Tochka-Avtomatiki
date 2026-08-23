@@ -35,7 +35,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^10.6.0",
+    "eslint": "^10.9.0",
     "globals": "^17.6.0",
     "stylelint": "^17.14.1",
     "stylelint-config-prettier-scss": "^1.0.0",

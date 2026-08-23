@@ -16,9 +16,10 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "concurrently": "^9.2.3",
-    "eslint": "^10.6.0",
-    "eslint-config-love": "^154.0.0",
+    "eslint": "^10.9.0",
+    "eslint-config-love": "^155.0.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",

@@ -1,14 +1,17 @@
-@import '../../styles/_vars';
-@import '../../styles/_mixins';
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
 .field {
   &.disabled {
     opacity: 0.5;
   }
+
   .label {
     font-weight: bold;
     margin-bottom: 2px;
     display: block;
   }
+
   .input {
     display: block;
     padding: 7px;
@@ -18,13 +21,16 @@
     outline: none;
     width: 100%;
     max-width: 200px;
+
     &:focus {
       border-color: $blue;
     }
+
     &.invalid {
       border-color: $red;
     }
   }
+
   .error {
     margin-top: 2px;
     color: $red;

@@ -12,23 +12,23 @@ export const AllMemesPage = () => {
   }
 
   if (isError) {
-    return <div>Error {error.message}...</div>
+    return <div>Error: {error.message}</div>
   }
 
   return (
     <Segment title="All Memes">
       <div className={css.memes}>
-        {data?.memes.map((mem) => (
+        {data?.map((mem) => (
           <div className={css.mem} key={mem.name}>
             <Segment
               size={2}
               description={mem.description}
               title={
                 <Link className={css.memLink} to={getViewMemeRoute(mem.name)}>
-                  {mem.title}
+                  {mem.id || mem.name} 
                 </Link>
               }
-            ></Segment>
+            />
           </div>
         ))}
       </div>

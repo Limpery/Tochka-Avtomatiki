@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { trpc } from '../../lib/trpc'
 
 export const getMemesTrpcRoute = trpc.procedure.query(async ({ ctx }) => {

@@ -24,7 +24,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^25.9.1",
+    "@types/node": "^24.12.4",
     "dotenv": "^17.4.2",
     "eslint": "^10.9.0",
     "prisma": "^7.9.1"

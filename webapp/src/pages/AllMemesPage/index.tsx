@@ -25,7 +25,7 @@ export const AllMemesPage = () => {
               description={mem.description}
               title={
                 <Link className={css.memLink} to={getViewMemeRoute(mem.name)}>
-                  {mem.id || mem.name} 
+                  {mem.title}
                 </Link>
               }
             />

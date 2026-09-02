@@ -5,6 +5,7 @@ export const getMemesTrpcRoute = trpc.procedure.query(async ({ ctx }) => {
     select: {
       id: true,
       name: true,
+      title: true,
       description: true,
     },
   })

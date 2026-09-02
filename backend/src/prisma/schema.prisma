@@ -9,6 +9,7 @@ datasource db {
 model Mem {
     id          String @id @default(uuid())
     name        String @unique
+    title       String
     description String
     text        String
 }

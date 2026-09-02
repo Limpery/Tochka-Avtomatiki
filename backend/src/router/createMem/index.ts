@@ -1,11 +1,18 @@
-import { memes } from '../../lib/memes'
 import { trpc } from '../../lib/trpc'
 import { zCreateMemTrpcInput } from './input'
 
-export const createMemTrpcRoute = trpc.procedure.input(zCreateMemTrpcInput).mutation(({ input }) => {
-  if (memes.find((mem) => mem.name === input.name)) {
+export const createMemTrpcRoute = trpc.procedure.input(zCreateMemTrpcInput).mutation(async ({ input, ctx }) => {
+  const exMem = await ctx.prisma.mem.findUnique({
+    where: {
+      name: input.name,
+    },
+  })
+  if (exMem) {
     throw Error('Mem already exists')
   }
-  memes.unshift(input)
+  await ctx.prisma.mem.create({
+    data: input,
+  })
+
   return true
 })

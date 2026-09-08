@@ -1,0 +1,8 @@
+packages:
+  - backend
+  - webapp
+allowBuilds:
+  '@parcel/watcher': false
+  '@prisma/engines': false
+  loodash: set this to true or false
+  prisma: false

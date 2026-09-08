@@ -1,0 +1,15 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Mem {
+    id          String @id @default(uuid())
+    name        String @unique
+    title       String
+    description String
+    text        String
+}

@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+const fs = require('fs');
+
+const filePath = process.argv[2];
+
+if (!filePath) {
+  process.exit(0);
+}
+
+try {
+  let content = fs.readFileSync(filePath, 'utf8');
+  let lines = content.split('\n');
+  let resultLines = [];
+  
+  let isFirstMessageLine = true;
+  let consecutiveEmptyCount = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    let isComment = line.trim().startsWith('#');
+    let isEmpty = line.trim() === '';
+
+    // 1. Системные комментарии Git пропускаем как есть
+    if (isComment) {
+      consecutiveEmptyCount = 0;
+      resultLines.push(line);
+      continue;
+    }
+
+    // 2. Обработка пустых строк
+    if (isEmpty) {
+      consecutiveEmptyCount++;
+      // Разрешаем только ОДНУ пустую строку подряд (стандарт Git)
+      if (consecutiveEmptyCount === 1 && resultLines.length > 0) {
+        resultLines.push('');
+      }
+      continue;
+    }
+
+    // 3. Обработка строк с текстом
+    consecutiveEmptyCount = 0; // Сбрасываем счетчик пустых строк
+
+    if (isFirstMessageLine) {
+      // Форматируем заголовок: убираем лишние пробелы, точку в конце, делаем первую букву заглавной
+      let formatted = line.replace(/\s+/g, ' ').trim();
+      if (formatted.endsWith('.')) {
+        formatted = formatted.slice(0, -1);
+      }
+      if (formatted.length > 0) {
+        formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+      }
+      resultLines.push(formatted);
+      isFirstMessageLine = false;
+    } else {
+      // Для тела коммита просто убираем пробелы в конце строки
+      resultLines.push(line.replace(/\s+$/g, ''));
+    }
+  }
+
+  // 4. Финальная очистка: удаляем пустые строки в самом конце файла (перед комментариями или EOF)
+  while (resultLines.length > 1 && resultLines[resultLines.length - 1].trim() === '') {
+    // Не удаляем пустую строку, если следующая за ней (в оригинале) была комментарием Git
+    // Но для чистоты просто удаляем все trailing empty lines
+    resultLines.pop();
+  }
+
+  // Записываем исправленный результат обратно в файл
+  fs.writeFileSync(filePath, resultLines.join('\n'), 'utf8');
+  
+} catch (error) {
+  console.error('Ошибка при форматировании сообщения коммита:', error);
+  process.exit(1);
+}

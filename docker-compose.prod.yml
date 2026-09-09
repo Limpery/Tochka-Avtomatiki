@@ -1,0 +1,58 @@
+# Prod-окружение: Postgres + backend (dist) + webapp (nginx)
+# Запуск: cp .env.example .env && docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+name: tochka-avtomatiki
+
+services:
+  db:
+    ports: [] # БД доступна только внутри compose-сети
+    restart: unless-stopped
+
+  migrate:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: prod
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tochka_db}:${POSTGRES_PASSWORD:-tochka_db}@db:5432/${POSTGRES_DB:-tochka_db}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ['sh', '-c', 'pnpm --dir /app/backend exec prisma migrate deploy']
+    restart: 'no'
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: prod
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tochka_db}:${POSTGRES_PASSWORD:-tochka_db}@db:5432/${POSTGRES_DB:-tochka_db}?schema=public
+      PORT: ${PORT:-3000}
+    ports:
+      - '${PORT:-3000}:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    volumes: [] # без hot-reload volumes в проде
+    command: ['node', 'dist/index.js']
+    restart: unless-stopped
+
+  webapp:
+    build:
+      context: .
+      dockerfile: ./webapp/Dockerfile
+      target: prod
+      args:
+        VITE_BACKEND_TRPC_URL: ${VITE_BACKEND_TRPC_URL:-http://localhost:3000/trpc}
+    ports:
+      - '8080:80'
+    depends_on:
+      - backend
+    volumes: []
+    restart: unless-stopped

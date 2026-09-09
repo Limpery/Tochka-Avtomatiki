@@ -1,15 +1,365 @@
+// ============================================================
+// Prisma Schema для платформы роботизации
+// ============================================================
+
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
+  provider = "postgresql"
 }
 
-model Robot {
-    id          String @id @default(uuid())
-    name        String @unique
-    title       String
-    description String
-    text        String
+// ============================================================
+// 1. СПРАВОЧНИКИ
+// ============================================================
+
+model Industry {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  slug        String       @unique @db.VarChar(50)
+  description String?
+  iconUrl     String?      @map("icon_url") @db.VarChar(500)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  objectTypes         ObjectType[]
+  solutionApplicability SolutionApplicability[]
+  caseStudies         CaseStudy[]
+
+  @@map("industries")
+}
+
+model ObjectType {
+  id          Int          @id @default(autoincrement())
+  industryId  Int          @map("industry_id")
+  name        String       @db.VarChar(100)
+  slug        String       @unique @db.VarChar(50)
+  description String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  industry            Industry             @relation(fields: [industryId], references: [id])
+  benchmarkObjects    BenchmarkObject[]
+  solutionApplicability SolutionApplicability[]
+  caseStudies         CaseStudy[]
+  userProjects        UserProject[]
+
+  @@map("object_types")
+}
+
+model SolutionCategory {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  slug        String       @unique @db.VarChar(50)
+  description String?
+
+  robotSolutions RobotSolution[]
+
+  @@map("solution_categories")
+}
+
+model Tag {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(80)
+  slug String @unique @db.VarChar(80)
+
+  solutionTags SolutionTag[]
+
+  @@map("tags")
+}
+
+// ============================================================
+// 2. ВЕНДОРЫ И РЕШЕНИЯ
+// ============================================================
+
+model Vendor {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(200)
+  website     String?      @db.VarChar(500)
+  country     String?      @db.VarChar(100)
+  description String?
+  logoUrl     String?      @map("logo_url") @db.VarChar(500)
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  robotSolutions RobotSolution[]
+
+  @@map("vendors")
+}
+
+model RobotSolution {
+  id              Int          @id @default(autoincrement())
+  vendorId        Int          @map("vendor_id")
+  categoryId      Int?         @map("category_id")
+  name            String       @db.VarChar(200)
+  slug            String       @unique @db.VarChar(100)
+  description     String?
+  priceMin        Decimal?     @map("price_min") @db.Decimal(12, 2)
+  priceMax        Decimal?     @map("price_max") @db.Decimal(12, 2)
+  currency        String       @default("RUB") @db.Char(3)
+  pricingModel    String?      @map("pricing_model") @db.VarChar(50)
+  imageUrl        String?      @map("image_url") @db.VarChar(500)
+  documentationUrl String?     @map("documentation_url") @db.VarChar(500)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  vendor              Vendor                @relation(fields: [vendorId], references: [id])
+  category            SolutionCategory?     @relation(fields: [categoryId], references: [id])
+  specs               SolutionSpec[]
+  applicability       SolutionApplicability[]
+  tags                SolutionTag[]
+  caseStudies         CaseStudy[]
+  ratings             SolutionRating[]
+  projectMatches      ProjectSolutionMatch[]
+  comparisonItems     ComparisonItem[]
+  economicCalculations EconomicCalculation[]
+
+  @@map("robot_solutions")
+}
+
+model SolutionSpec {
+  id          Int          @id @default(autoincrement())
+  solutionId  Int          @map("solution_id")
+  specName    String       @map("spec_name") @db.VarChar(100)
+  specValue   String       @map("spec_value") @db.VarChar(100)
+  specUnit    String?      @map("spec_unit") @db.VarChar(30)
+  sortOrder   Int          @default(0) @map("sort_order")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  solution RobotSolution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+
+  @@index([solutionId])
+  @@index([specName])
+  @@map("solution_specs")
+}
+
+model SolutionApplicability {
+  id               Int          @id @default(autoincrement())
+  solutionId       Int          @map("solution_id")
+  industryId       Int          @map("industry_id")
+  objectTypeId     Int?         @map("object_type_id")
+  suitabilityScore Decimal      @default(1.00) @map("suitability_score") @db.Decimal(3, 2)
+  notes            String?
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  solution   RobotSolution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  industry   Industry      @relation(fields: [industryId], references: [id])
+  objectType ObjectType?   @relation(fields: [objectTypeId], references: [id])
+
+  @@unique([solutionId, industryId, objectTypeId])
+  @@index([industryId])
+  @@index([objectTypeId])
+  @@map("solution_applicability")
+}
+
+model SolutionTag {
+  id          Int          @id @default(autoincrement())
+  solutionId  Int          @map("solution_id")
+  tagId       Int          @map("tag_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  solution RobotSolution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  tag      Tag           @relation(fields: [tagId], references: [id])
+
+  @@unique([solutionId, tagId])
+  @@index([solutionId])
+  @@index([tagId])
+  @@map("solution_tags")
+}
+
+model CaseStudy {
+  id             Int          @id @default(autoincrement())
+  solutionId     Int          @map("solution_id")
+  companyName    String?      @map("company_name") @db.VarChar(200)
+  industryId     Int?         @map("industry_id")
+  objectTypeId   Int?         @map("object_type_id")
+  title          String       @db.VarChar(300)
+  description    String?
+  results        Json?
+  publishedAt    DateTime?    @map("published_at") @db.Date
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  solution   RobotSolution @relation(fields: [solutionId], references: [id])
+  industry   Industry?     @relation(fields: [industryId], references: [id])
+  objectType ObjectType?   @relation(fields: [objectTypeId], references: [id])
+
+  @@map("case_studies")
+}
+
+model SolutionRating {
+  id          Int          @id @default(autoincrement())
+  solutionId  Int          @map("solution_id")
+  userId      Int          @map("user_id")
+  rating      Int
+  review      String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  solution RobotSolution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id])
+
+  @@unique([solutionId, userId])
+  @@map("solution_ratings")
+}
+
+// ============================================================
+// 3. ЭТАЛОННЫЕ ДАННЫЕ
+// ============================================================
+
+model BenchmarkObject {
+  id             Int          @id @default(autoincrement())
+  objectTypeId   Int          @map("object_type_id")
+  name           String       @db.VarChar(200)
+  description    String?
+  data           Json
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  objectType ObjectType @relation(fields: [objectTypeId], references: [id])
+
+  userProjects UserProject[]
+
+  @@map("benchmark_objects")
+}
+
+// ============================================================
+// 4. ПОЛЬЗОВАТЕЛИ И ПРОЕКТЫ
+// ============================================================
+
+model User {
+  id            Int          @id @default(autoincrement())
+  email         String       @unique @db.VarChar(200)
+  passwordHash  String       @map("password_hash") @db.VarChar(255)
+  name          String?      @db.VarChar(100)
+  company       String?      @db.VarChar(200)
+  role          String       @default("user") @db.VarChar(30)
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  projects   UserProject[]
+  ratings    SolutionRating[]
+  comparisons Comparison[]
+
+  @@map("users")
+}
+
+model UserProject {
+  id                  Int          @id @default(autoincrement())
+  userId              Int          @map("user_id")
+  objectTypeId        Int          @map("object_type_id")
+  name                String       @db.VarChar(200)
+  description         String?
+  useBenchmark        Boolean      @default(false) @map("use_benchmark")
+  benchmarkObjectId   Int?         @map("benchmark_object_id")
+  areaSqm             Decimal?     @map("area_sqm") @db.Decimal(10, 2)
+  employeeCount       Int?         @map("employee_count")
+  shiftCount          Int?         @map("shift_count") @db.SmallInt
+  operatingHours      Decimal?     @map("operating_hours") @db.Decimal(5, 1)
+  monthlyFund         Decimal?     @map("monthly_fund") @db.Decimal(14, 2)
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  objectType   ObjectType              @relation(fields: [objectTypeId], references: [id])
+  benchmark    BenchmarkObject?        @relation(fields: [benchmarkObjectId], references: [id])
+  processes    UserProjectProcess[]
+  matches      ProjectSolutionMatch[]
+  comparisons  Comparison[]
+  calculations EconomicCalculation[]
+
+  @@index([userId])
+  @@index([objectTypeId])
+  @@map("user_projects")
+}
+
+model UserProjectProcess {
+  id             Int          @id @default(autoincrement())
+  projectId      Int          @map("project_id")
+  processName    String       @map("process_name") @db.VarChar(200)
+  currentCost    Decimal?     @map("current_cost") @db.Decimal(14, 2)
+  currentHours   Decimal?     @map("current_hours") @db.Decimal(8, 2)
+  employeeCount  Int?         @map("employee_count")
+  frequency      String?      @db.VarChar(50)
+  description    String?
+  sortOrder      Int          @default(0) @map("sort_order")
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  project UserProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("user_project_processes")
+}
+
+// ============================================================
+// 5. ПОДБОР И СРАВНЕНИЕ (ЗАГЛУШКИ)
+// ============================================================
+
+model ProjectSolutionMatch {
+  id                Int          @id @default(autoincrement())
+  projectId         Int          @map("project_id")
+  solutionId        Int          @map("solution_id")
+  matchScore        Decimal      @default(0) @map("match_score") @db.Decimal(5, 2)
+  estimatedCost     Decimal?     @map("estimated_cost") @db.Decimal(14, 2)
+  estimatedSavings  Decimal      @default(0) @map("estimated_savings") @db.Decimal(14, 2)
+  roiMonths         Decimal      @default(0) @map("roi_months") @db.Decimal(6, 1)
+  notes             String?
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  project  UserProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  solution RobotSolution   @relation(fields: [solutionId], references: [id])
+
+  @@unique([projectId, solutionId])
+  @@index([projectId])
+  @@index([solutionId])
+  @@map("project_solution_matches")
+}
+
+model Comparison {
+  id         Int          @id @default(autoincrement())
+  userId     Int          @map("user_id")
+  projectId  Int?         @map("project_id")
+  name       String?      @db.VarChar(200)
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project UserProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  items ComparisonItem[]
+
+  @@index([userId])
+  @@map("comparisons")
+}
+
+model ComparisonItem {
+  id            Int          @id @default(autoincrement())
+  comparisonId  Int          @map("comparison_id")
+  solutionId    Int          @map("solution_id")
+  position      Int          @default(0) @db.SmallInt
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  comparison Comparison    @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  solution   RobotSolution @relation(fields: [solutionId], references: [id])
+
+  @@unique([comparisonId, solutionId])
+  @@index([comparisonId])
+  @@map("comparison_items")
+}
+
+model EconomicCalculation {
+  id                  Int          @id @default(autoincrement())
+  projectId           Int          @map("project_id")
+  solutionId          Int          @map("solution_id")
+  initialInvestment   Decimal?     @map("initial_investment") @db.Decimal(14, 2)
+  annualMaintenance   Decimal?     @map("annual_maintenance") @db.Decimal(14, 2)
+  annualEnergyCost    Decimal?     @map("annual_energy_cost") @db.Decimal(14, 2)
+  annualSavings       Decimal      @default(0) @map("annual_savings") @db.Decimal(14, 2)
+  paybackMonths       Decimal      @default(0) @map("payback_months") @db.Decimal(6, 1)
+  roi3yr              Decimal      @default(0) @map("roi_3yr") @db.Decimal(8, 2)
+  roi5yr              Decimal      @default(0) @map("roi_5yr") @db.Decimal(8, 2)
+  npv                 Decimal      @default(0) @db.Decimal(14, 2)
+  irr                 Decimal      @default(0) @db.Decimal(8, 4)
+  assumptions         Json?
+  createdAt           DateTime     @default(now()) @map("created_at")
+
+  project  UserProject     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  solution RobotSolution   @relation(fields: [solutionId], references: [id])
+
+  @@unique([projectId, solutionId])
+  @@index([projectId])
+  @@index([solutionId])
+  @@map("economic_calculations")
 }

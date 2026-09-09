@@ -19,7 +19,7 @@ const trpcClient = trpc.createClient({
   // trpcClient
   links: [
     httpBatchLink({
-      url: 'http://localhost:3000/trpc', // URL для запросов к серверу TRPC
+      url: import.meta.env.VITE_BACKEND_TRPC_URL ?? 'http://localhost:3000/trpc', // URL для запросов к серверу TRPC
     }),
   ],
 })

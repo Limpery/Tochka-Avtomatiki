@@ -108,12 +108,12 @@ importers:
 
   webapp:
     dependencies:
-      '@memmemory/backend':
-        specifier: workspace:*
-        version: link:../backend
       '@tanstack/react-query':
         specifier: ^5.100.14
         version: 5.100.14(react@19.2.6)
+      '@tochka-avtomatiki/backend':
+        specifier: workspace:*
+        version: link:../backend
       '@trpc/client':
         specifier: ^11.17.0
         version: 11.17.0(@trpc/server@11.17.0(typescript@6.0.3))(typescript@6.0.3)

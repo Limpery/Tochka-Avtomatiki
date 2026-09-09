@@ -1,7 +1,7 @@
 import { trpc } from '../../lib/trpc'
 
-export const getMemesTrpcRoute = trpc.procedure.query(async ({ ctx }) => {
-  const memes = await ctx.prisma.mem.findMany({
+export const getRobotsTrpcRoute = trpc.procedure.query(async ({ ctx }) => {
+  const robots = await ctx.prisma.robot.findMany({
     select: {
       id: true,
       name: true,
@@ -10,5 +10,5 @@ export const getMemesTrpcRoute = trpc.procedure.query(async ({ ctx }) => {
     },
   })
 
-  return memes
+  return robots
 })

@@ -1,8 +1,8 @@
 {
-  "name": "@memmemory/backend",
+  "name": "@tochka-avtomatiki/backend",
   "private": true,
   "version": "0.0.0",
-  "description": "MemMemory backend",
+  "description": "Tochka Avtomatiki backend",
   "scripts": {
     "build": "rimraf dist && tsc",
     "dev": "ts-node-dev --watch ./.env --rs --exit-child ./src/index.ts",

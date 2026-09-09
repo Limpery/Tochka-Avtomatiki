@@ -1,5 +1,5 @@
 {
-  "name": "@memmemory/webapp",
+  "name": "@tochka-avtomatiki/webapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "prettify": "prettier --log-level warn --cache --write '{src/**/*,*}.{ts,tsx,js,json,yml,scss}' '!**/{node_modules,dist}/**/*'"
   },
   "dependencies": {
-    "@memmemory/backend": "workspace:*",
+    "@tochka-avtomatiki/backend": "workspace:*",
     "@tanstack/react-query": "^5.100.14",
     "@trpc/client": "^11.17.0",
     "@trpc/react-query": "^11.17.0",

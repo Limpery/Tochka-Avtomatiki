@@ -16,7 +16,7 @@ COPY backend/package.json ./backend/package.json
 COPY webapp/package.json ./webapp/package.json
 # --ignore-scripts: prepare (pnpm pgc) требует schema + prisma.config.ts,
 # которых на этом этапе ещё нет — генерация выполняется в build/prod/dev позже
-RUN pnpm install --filter @memmemory/backend --frozen-lockfile --ignore-scripts
+RUN pnpm install --filter @tochka-avtomatiki/backend --frozen-lockfile --ignore-scripts
 
 # ---------- build ----------
 FROM base AS build
@@ -26,8 +26,8 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend ./backend
 # prisma generate читает prisma.config.ts -> нужен DATABASE_URL (достаточно dummy)
 ENV DATABASE_URL="postgresql://tochka_db:tochka_db@localhost:5432/tochka_db?schema=public"
-RUN pnpm --filter @memmemory/backend pgc && \
-    pnpm --filter @memmemory/backend build
+RUN pnpm --filter @tochka-avtomatiki/backend pgc && \
+    pnpm --filter @tochka-avtomatiki/backend build
 
 # ---------- prod ----------
 FROM node:24-alpine AS prod
@@ -39,7 +39,7 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend/package.json ./backend/package.json
 COPY webapp/package.json ./webapp/package.json
 # Ставим все зависимости (prisma CLI — devDep, нужен в рантайме для migrate deploy)
-RUN pnpm install --filter @memmemory/backend --frozen-lockfile --ignore-scripts
+RUN pnpm install --filter @tochka-avtomatiki/backend --frozen-lockfile --ignore-scripts
 COPY --from=build /app/backend/dist ./backend/dist
 COPY --from=build /app/backend/src/prisma ./backend/src/prisma
 COPY --from=build /app/backend/prisma.config.ts ./backend/prisma.config.ts
@@ -53,7 +53,7 @@ FROM base AS dev
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend/package.json ./backend/package.json
 COPY webapp/package.json ./webapp/package.json
-RUN pnpm install --filter @memmemory/backend --frozen-lockfile --ignore-scripts
+RUN pnpm install --filter @tochka-avtomatiki/backend --frozen-lockfile --ignore-scripts
 COPY backend ./backend
 WORKDIR /app/backend
 EXPOSE 3000

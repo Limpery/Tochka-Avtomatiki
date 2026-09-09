@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { TrpcProvider } from './lib/trpc'
 import * as routes from './lib/routes'
-import { AllMemesPage } from './pages/AllMemesPage'
-import { ViewMemePage } from './pages/ViewMemePage'
+import { AllRobotsPage } from './pages/AllRobotsPage'
+import { ViewRobotPage } from './pages/ViewRobotPage'
 import { Layout } from './components/Layout'
-import { NewMemPage } from './pages/NewMemPage'
+import { NewRobotPage } from './pages/NewRobotPage'
 import './styles/global.scss'
 
 export const App = () => (
@@ -12,9 +12,9 @@ export const App = () => (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route path={routes.getAllMemesRoute()} element={<AllMemesPage />} />
-          <Route path={routes.getNewMemeRoute()} element={<NewMemPage />} />
-          <Route path={routes.getViewMemeRoute(routes.viewMemeRouteParams.nameMem)} element={<ViewMemePage />} />
+          <Route path={routes.getAllRobotsRoute()} element={<AllRobotsPage />} />
+          <Route path={routes.getNewRobotRoute()} element={<NewRobotPage />} />
+          <Route path={routes.getViewRobotRoute(routes.viewRobotRouteParams.nameRobot)} element={<ViewRobotPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

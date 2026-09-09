@@ -1,4 +1,4 @@
-import type { TrpcRouter } from '@memmemory/backend/src/router'
+import type { TrpcRouter } from '@tochka-avtomatiki/backend/src/router'
 import { createTRPCReact } from '@trpc/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { httpBatchLink } from '@trpc/client'

@@ -1,4 +1,4 @@
-import { zCreateMemTrpcInput } from '@memmemory/backend/src/router/createMem/input'
+import { zCreateRobotTrpcInput } from '@tochka-avtomatiki/backend/src/router/createRobot/input'
 import { useFormik } from 'formik'
 import { Segment } from '../../components/Segment'
 import { Input } from '../../components/Input'
@@ -10,10 +10,10 @@ import { Alert } from '../../components/Alert'
 import { Button } from '../../components/Button'
 import { FormItems } from '../../components/FormItems'
 
-export const NewMemPage = () => {
+export const NewRobotPage = () => {
   const [succesMessageVisible, setSuccessMessageVisible] = useState(false)
   const [submittingError, setSubmittingError] = useState<string | null>(null)
-  const createMem = trpc.createMem.useMutation()
+  const createRobot = trpc.createRobot.useMutation()
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -21,10 +21,10 @@ export const NewMemPage = () => {
       description: '',
       text: '',
     },
-    validate: withZodSchema(zCreateMemTrpcInput),
+    validate: withZodSchema(zCreateRobotTrpcInput),
     onSubmit: async (values) => {
       try {
-        await createMem.mutateAsync(values)
+        await createRobot.mutateAsync(values)
         formik.resetForm()
         setSuccessMessageVisible(true)
         setTimeout(() => {
@@ -41,7 +41,7 @@ export const NewMemPage = () => {
   })
 
   return (
-    <Segment title="New Mem">
+    <Segment title="New Robot">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -55,8 +55,8 @@ export const NewMemPage = () => {
           <Textarea name="text" label="Text" formik={formik} />
           {!formik.isValid && !!formik.submitCount && <div style={{ color: 'red' }}>Some fields are invalid</div>}
           {!!submittingError && <Alert color={'red'}>Error: {submittingError}</Alert>}
-          {succesMessageVisible && <Alert color={'green'}>Mem created</Alert>}
-          <Button loading={formik.isSubmitting}>Create Mem </Button>
+          {succesMessageVisible && <Alert color={'green'}>Robot created</Alert>}
+          <Button loading={formik.isSubmitting}>Create Robot </Button>
         </FormItems>
       </form>
     </Segment>

@@ -14,7 +14,7 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend/package.json ./backend/package.json
 COPY webapp/package.json ./webapp/package.json
 # --ignore-scripts: prepare бэкенда (pnpm pgc) требует schema, которой тут ещё нет
-RUN pnpm install --filter @memmemory/webapp --frozen-lockfile --ignore-scripts
+RUN pnpm install --filter @tochka-avtomatiki/webapp --frozen-lockfile --ignore-scripts
 
 # ---------- build ----------
 FROM base AS build
@@ -28,8 +28,8 @@ ARG VITE_BACKEND_TRPC_URL=http://localhost:3000/trpc
 ENV VITE_BACKEND_TRPC_URL=$VITE_BACKEND_TRPC_URL
 # prisma generate читает prisma.config.ts -> нужен DATABASE_URL (достаточно dummy, только для generate)
 ENV DATABASE_URL="postgresql://tochka_db:tochka_db@localhost:5432/tochka_db?schema=public"
-RUN pnpm --filter @memmemory/backend pgc && \
-    pnpm --filter @memmemory/webapp build
+RUN pnpm --filter @tochka-avtomatiki/backend pgc && \
+    pnpm --filter @tochka-avtomatiki/webapp build
 
 # ---------- prod (nginx, SPA) ----------
 FROM nginx:alpine AS prod
@@ -43,7 +43,7 @@ FROM base AS dev
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY backend/package.json ./backend/package.json
 COPY webapp/package.json ./webapp/package.json
-RUN pnpm install --filter @memmemory/webapp --frozen-lockfile --ignore-scripts
+RUN pnpm install --filter @tochka-avtomatiki/webapp --frozen-lockfile --ignore-scripts
 COPY backend ./backend
 COPY webapp ./webapp
 WORKDIR /app/webapp

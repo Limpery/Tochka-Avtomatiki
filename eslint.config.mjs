@@ -61,7 +61,11 @@ export default [
         {
           patterns: [
             {
-              group: ['@memmemory/backend/**', '!@memmemory/backend/**/', '!@memmemory/backend/**/input'],
+              group: [
+                '@tochka-avtomatiki/backend/**',
+                '!@tochka-avtomatiki/backend/**/',
+                '!@tochka-avtomatiki/backend/**/input',
+              ],
               allowTypeImports: true,
               message: 'Only types and input schemas are allowed to be imported from backend workspace',
             },

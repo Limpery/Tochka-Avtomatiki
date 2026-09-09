@@ -6,7 +6,7 @@ datasource db {
     provider = "postgresql"
 }
 
-model Mem {
+model Robot {
     id          String @id @default(uuid())
     name        String @unique
     title       String

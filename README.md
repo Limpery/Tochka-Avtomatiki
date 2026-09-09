@@ -192,14 +192,14 @@ cp .env.example .env
 # при необходимости поправьте DATABASE_URL под локальный Postgres
 
 # Миграции + генерация клиента
-pnpm --filter @memmemory/backend pmd
-pnpm --filter @memmemory/backend pgc
+pnpm --filter @tochka-avtomatiki/backend pmd
+pnpm --filter @tochka-avtomatiki/backend pgc
 
 # Запуск backend (в одном терминале)
-pnpm --filter @memmemory/backend dev
+pnpm --filter @tochka-avtomatiki/backend dev
 # -> http://localhost:3000 (GET /ping, POST /trpc)
 
 # Запуск webapp (в другом терминале)
-pnpm --filter @memmemory/webapp dev
+pnpm --filter @tochka-avtomatiki/webapp dev
 # -> http://localhost:5173
 ```

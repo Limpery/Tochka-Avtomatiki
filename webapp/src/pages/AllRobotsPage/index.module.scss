@@ -1,17 +1,17 @@
 @import '../../styles/vars';
 @import '../../styles/mixins';
 
-.memes {
-  .mem {
+.robots {
+  .robot {
     padding: 20px;
     border: 1px solid $black;
     border-radius: 10px;
 
-    & + .mem {
+    & + .robot {
       margin-top: 20px;
     }
 
-    .memLink {
+    .robotLink {
       @include link;
     }
   }

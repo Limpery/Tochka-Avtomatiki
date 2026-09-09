@@ -1,10 +1,10 @@
 {
-  "name": "memmemory",
+  "name": "tochka-avtomatiki",
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "b": "pnpm --filter @memmemory/backend",
-    "w": "pnpm --filter @memmemory/webapp",
+    "b": "pnpm --filter @tochka-avtomatiki/backend",
+    "w": "pnpm --filter @tochka-avtomatiki/webapp",
     "dev": "pnpm -r --parallel dev",
     "types": "concurrently 'pnpm b types' 'pnpm w types'",
     "lint": "concurrently 'pnpm b lint' 'pnpm w lint'",

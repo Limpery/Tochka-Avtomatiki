@@ -35,6 +35,7 @@
 2. **Сложность оценки ROI** — невозможность быстро оценить экономический эффект применительно к своему объекту
 
 ### Дополнительные вызовы:
+
 - 📊 Рынок роботизированных решений фрагментирован
 - 🎯 Вендоры дают оценки в свою пользу
 - 🔍 Отсутствует независимый инструмент сравнения
@@ -53,7 +54,7 @@
 
 ---
 
-##  Функциональность
+## Функциональность
 
 ### Шаг 1: Выбор отрасли и типа объекта
 
@@ -62,33 +63,35 @@
 - 🏭 **Торговля** — складские комплексы (с примерами данных)
 - ✈️ **Логистика** — аэропорты и терминалы (с примерами данных)
 - 🏥 **Социальная сфера** — медицинские учреждения (с примерами данных)
--  **Другое** — произвольный объект на усмотрение пользователя
+- **Другое** — произвольный объект на усмотрение пользователя
 
 ### Шаг 2: Подборка и сравнение решений
 
 Платформа показывает доступные на рынке решения:
 
--  Типы роботизированных решений
+- Типы роботизированных решений
 - 🤖 Отдельные продукты внутри каждого типа
 - 📊 Ключевые характеристики и сравнительные показатели
--  Данные от организатора + информация из открытых источников
+- Данные от организатора + информация из открытых источников
 
 ### Шаг 3: Расчёт экономики
 
 Интерактивный калькулятор для оценки эффективности:
 
 **Входные параметры:**
+
 - Площадь объекта
 - Объём операций
 - Численность персонала
 - Другие параметры объекта
 
 **Расчётные показатели:**
+
 - 💰 **OPEX** (операционные расходы)
 - ️ **CAPEX** (капитальные затраты)
 - 📈 **ROI** (возврат инвестиций)
 - ⏰ **Срок окупаемости**
--  Потребность в ресурсах
+- Потребность в ресурсах
 
 ### Шаг 4: Визуализация
 
@@ -100,61 +103,103 @@
 
 ---
 
-##  Технологии
+## Технологии
 
 ### Frontend
+
 - React.js / Vue.js
 - TypeScript
 - Three.js / Babylon.js (для 3D-визуализации)
 - D3.js / Chart.js (для графиков и аналитики)
 
 ### Backend
+
 - Python (FastAPI / Django)
 - Node.js (опционально)
 - PostgreSQL / MongoDB
 - Redis (кэширование)
 
 ### Data & ML
+
 - Pandas, NumPy (анализ данных)
 - Scikit-learn (моделирование)
 - Jupyter Notebooks
 
 ### DevOps
+
 - Docker
 - CI/CD (GitHub Actions)
 - AWS / Google Cloud / Azure
 
 ---
 
-##  Установка
+## Установка
 
 ### Требования
-- Python 3.9+
-- Node.js 16+
-- PostgreSQL 13+
 
-### Локальная разработка
+- Node.js 24+ (см. `.nvmrc`)
+- pnpm 9+
+- Docker + Docker Compose (для контейнерного запуска)
+- PostgreSQL 13+ (только для локального запуска без Docker)
+
+### Запуск через Docker (рекомендуется)
 
 ```bash
-# Клонирование репозитория
-git clone https://github.com/Limpery/Tochka-Avtomatiki.git
-cd Tochka-Avtomatiki
+# 1. Скопировать env
+cp .env.example .env
 
-# Установка backend зависимостей
-cd backend
-pip install -r requirements.txt
+# 2. Dev-режим (Postgres + backend hot-reload + Vite hot-reload)
+docker compose up --build
 
-# Установка frontend зависимостей
-cd ../frontend
-npm install
+# 3. Prod-режим (Postgres + backend dist + nginx)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
 
-# Настройка базы данных
-# (инструкции по настройке БД)
+Сервисы и порты:
 
-# Запуск backend
-cd backend
-python main.py
+| Сервис  | Dev              | Prod                     |
+| ------- | ---------------- | ------------------------ |
+| db      | `localhost:5432` | только внутри сети       |
+| backend | `localhost:3000` | `localhost:3000`         |
+| webapp  | `localhost:5173` | `localhost:8080` (nginx) |
 
-# Запуск frontend (в новом терминале)
-cd frontend
-npm run dev
+Переменные окружения (см. `.env.example`):
+
+- `POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB` — credentials Postgres (default `tochka_db`)
+- `DATABASE_URL` — для локального `pnpm dev` (через `localhost`)
+- `PORT` — порт backend (default `3000`)
+- `VITE_BACKEND_TRPC_URL` — URL tRPC, вшивается во фронт на build (default `http://localhost:3000/trpc`)
+
+Внутри compose backend подключается к БД по `DATABASE_URL_DOCKER`
+(`postgresql://...@db:5432/...`), миграции применяются автоматически
+(`prisma migrate deploy` при старте backend / отдельным `migrate` сервисом в проде).
+
+Проверка:
+
+```bash
+curl http://localhost:3000/ping
+# pong
+```
+
+### Локальная разработка (без Docker)
+
+```bash
+# Установка зависимостей
+pnpm install
+
+# Настройка БД
+cp .env.example .env
+# при необходимости поправьте DATABASE_URL под локальный Postgres
+
+# Миграции + генерация клиента
+pnpm --filter @memmemory/backend pmd
+pnpm --filter @memmemory/backend pgc
+
+# Запуск backend (в одном терминале)
+pnpm --filter @memmemory/backend dev
+# -> http://localhost:3000 (GET /ping, POST /trpc)
+
+# Запуск webapp (в другом терминале)
+pnpm --filter @memmemory/webapp dev
+# -> http://localhost:5173
+```

@@ -40,7 +40,9 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes: [] # без hot-reload volumes в проде
-    command: ['node', 'dist/index.js']
+    # generate обязателен: prod-установка node_modules свежая (--ignore-scripts),
+    # клиент из build-стадии не переносится; migrate уже выполнен сервисом migrate
+    command: ['sh', '-c', 'pnpm exec prisma generate && node dist/index.js']
     restart: unless-stopped
 
   webapp:

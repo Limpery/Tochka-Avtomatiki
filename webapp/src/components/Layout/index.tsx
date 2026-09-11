@@ -1,20 +1,25 @@
 import { Link, Outlet } from 'react-router-dom'
-import { getAllRobotsRoute, getNewRobotRoute } from '../../lib/routes'
+import { getCatalogRoute, getObjectSelectRoute, getProjectsRoute } from '../../lib/routes'
 import css from './index.module.scss'
 
 export const Layout = () => (
   <div className={css.layout}>
     <div className={css.navigation}>
-      <div className={css.logo}>Tochka Avtomatiki</div>
+      <div className={css.logo}>Точка Автоматики</div>
       <ul className={css.menu}>
         <li className={css.item}>
-          <Link className={css.link} to={getAllRobotsRoute()}>
-            All Robots
+          <Link className={css.link} to={getObjectSelectRoute()}>
+            1. Объект
           </Link>
         </li>
         <li className={css.item}>
-          <Link className={css.link} to={getNewRobotRoute()}>
-            Add Robot
+          <Link className={css.link} to={getCatalogRoute()}>
+            2. Решения
+          </Link>
+        </li>
+        <li className={css.item}>
+          <Link className={css.link} to={getProjectsRoute()}>
+            3. Проекты и экономика
           </Link>
         </li>
       </ul>

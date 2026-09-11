@@ -1,11 +1,25 @@
-const getRouteParams = <T extends Record<string, boolean>>(object: T) =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
-  Object.keys(object).reduce((acc, key) => ({ ...acc, [key]: `:${key}` }), {}) as Record<keyof T, string>
+export const getObjectSelectRoute = () => '/'
 
-export const getAllRobotsRoute = () => '/'
+export const getCatalogRoute = (params?: { industry?: string; objectType?: string }) => {
+  const q = new URLSearchParams()
+  if (params?.industry) {
+    q.set('industry', params.industry)
+  }
+  if (params?.objectType) {
+    q.set('objectType', params.objectType)
+  }
+  const s = q.toString()
+  return s ? `/catalog?${s}` : '/catalog'
+}
 
-export const viewRobotRouteParams = getRouteParams({ nameRobot: true })
-export type ViewRobotRouteParams = typeof viewRobotRouteParams
-export const getViewRobotRoute = (nameRobot: string) => `/robots/${nameRobot}`
+export const getSolutionRoute = (slug: string, projectId?: number) =>
+  projectId ? `/solutions/${slug}?projectId=${projectId}` : `/solutions/${slug}`
 
-export const getNewRobotRoute = () => '/robots/new'
+export const getCompareRoute = (id: number) => `/compare/${id}`
+
+export const getProjectsRoute = () => '/projects'
+
+export const getProjectRoute = (id: number) => `/projects/${id}`
+
+export const getSimulationRoute = (projectId: number, solutionId?: number) =>
+  solutionId ? `/projects/${projectId}/simulation?solutionId=${solutionId}` : `/projects/${projectId}/simulation`

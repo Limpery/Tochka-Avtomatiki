@@ -19,6 +19,10 @@ export const getCompareRoute = (id: number) => `/compare/${id}`
 
 export const getProjectsRoute = () => '/projects'
 
+export const getLoginRoute = () => '/login'
+
+export const getRegisterRoute = () => '/register'
+
 export const getProjectRoute = (id: number) => `/projects/${id}`
 
 export const getSimulationRoute = (projectId: number, solutionId?: number) =>

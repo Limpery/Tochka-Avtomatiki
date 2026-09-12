@@ -32,9 +32,22 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        projectService: true, // Автопоиск tsconfig.json в подпапках
+        // Объект (не boolean): allowDefaultProject работает только внутри projectService.
+        // До этого ключ лежал рядом и игнорировался — отсюда была предсуществующая
+        // ошибка парсинга backend/prisma.config.ts.
+        projectService: {
+          // Только точные пути без `**`: широкие глобы запрещены
+          // (см. tseslint allowDefaultProject-glob-too-wide).
+          allowDefaultProject: [
+            'backend/prisma.config.ts',
+            'backend/src/*.test.ts',
+            'backend/src/*/*.test.ts',
+            'webapp/src/*.test.ts',
+            'webapp/src/*/*.test.ts',
+            'webapp/src/*/*/*.test.ts',
+          ],
+        },
         tsconfigRootDir: import.meta.dirname,
-        allowDefaultProject: ['**/*.config.ts', '**/*.config.mjs'],
       },
     },
   },

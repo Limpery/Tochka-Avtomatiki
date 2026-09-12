@@ -26,6 +26,10 @@ COPY backend ./backend
 COPY webapp ./webapp
 ARG VITE_BACKEND_TRPC_URL=http://localhost:3000/trpc
 ENV VITE_BACKEND_TRPC_URL=$VITE_BACKEND_TRPC_URL
+# Почему отдельным ARG: REST-фасад /api/* используется auth-стором и axios-клиентом,
+# в проде за nginx это должен быть публично доступный URL, а не localhost по умолчанию.
+ARG VITE_BACKEND_API_URL=http://localhost:3000/api
+ENV VITE_BACKEND_API_URL=$VITE_BACKEND_API_URL
 # prisma generate читает prisma.config.ts -> нужен DATABASE_URL (достаточно dummy, только для generate)
 ENV DATABASE_URL="postgresql://tochka_db:tochka_db@localhost:5432/tochka_db?schema=public"
 RUN pnpm --filter @tochka-avtomatiki/backend pgc && \

@@ -1,8 +1,8 @@
 import { trpc } from '../../lib/trpc'
-import { getDemoUserId } from '../../lib/demoUser'
+import { getActiveUserId } from '../../lib/demoUser'
 
 export const listProjectsTrpcRoute = trpc.procedure.query(async ({ ctx }) => {
-  const userId = await getDemoUserId(ctx.prisma)
+  const userId = await getActiveUserId(ctx)
   const projects = await ctx.prisma.userProject.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },

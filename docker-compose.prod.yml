@@ -52,6 +52,7 @@ services:
       target: prod
       args:
         VITE_BACKEND_TRPC_URL: ${VITE_BACKEND_TRPC_URL:-http://localhost:3000/trpc}
+        VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL:-http://localhost:3000/api}
     ports:
       - '8080:80'
     depends_on:

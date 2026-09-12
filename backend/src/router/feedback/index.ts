@@ -1,6 +1,6 @@
 import z from 'zod'
 import { trpc } from '../../lib/trpc'
-import { getDemoUserId } from '../../lib/demoUser'
+import { getActiveUserId } from '../../lib/demoUser'
 
 export const listCaseStudiesTrpcRoute = trpc.procedure
   .input(z.object({ solutionId: z.number().int().optional() }))
@@ -26,7 +26,7 @@ export const createRatingTrpcRoute = trpc.procedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    const userId = await getDemoUserId(ctx.prisma)
+    const userId = await getActiveUserId(ctx)
     await ctx.prisma.solutionRating.upsert({
       where: { solutionId_userId: { solutionId: input.solutionId, userId } },
       update: { rating: input.rating, review: input.review },

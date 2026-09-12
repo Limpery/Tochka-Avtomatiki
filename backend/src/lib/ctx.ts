@@ -20,3 +20,9 @@ export const createAppContext = () => {
 }
 
 export type AppContext = ReturnType<typeof createAppContext>
+
+// Почему userId nullable и отдельно от AppContext: tRPC-контекст собирается
+// на каждый запрос из заголовка Authorization, а базовый контекст — один на процесс.
+export interface RequestContext extends AppContext {
+  userId: number | null
+}

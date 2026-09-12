@@ -1,4 +1,5 @@
 import { trpc } from '../lib/trpc'
+import { loginTrpcRoute, meTrpcRoute, registerTrpcRoute } from './auth'
 import { listIndustriesTrpcRoute } from './listIndustries'
 import { listObjectTypesTrpcRoute } from './listObjectTypes'
 import { listBenchmarksTrpcRoute } from './listBenchmarks'
@@ -15,6 +16,9 @@ import { comparisonsTrpcRouter } from './comparisons'
 import { createRatingTrpcRoute, listCaseStudiesTrpcRoute } from './feedback'
 
 export const trpcRouter = trpc.router({
+  register: registerTrpcRoute,
+  login: loginTrpcRoute,
+  me: meTrpcRoute,
   listIndustries: listIndustriesTrpcRoute,
   listObjectTypes: listObjectTypesTrpcRoute,
   listBenchmarks: listBenchmarksTrpcRoute,

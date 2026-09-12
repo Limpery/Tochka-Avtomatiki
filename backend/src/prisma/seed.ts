@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/strict-void-return */
 /* eslint-disable no-unused-vars */
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import bcrypt from 'bcryptjs'
 
 // 1. Создаем адаптер, передавая ему URL базы данных из .env
 const adapter = new PrismaPg({
@@ -224,43 +226,48 @@ async function main() {
   })
 
   // Характеристики решений
-  await prisma.solutionSpec.createMany({
-    data: [
-      // AMR-500 Pro
-      { solutionId: solution1.id, specName: 'Грузоподъёмность', specValue: '500', specUnit: 'кг', sortOrder: 1 },
-      { solutionId: solution1.id, specName: 'Скорость', specValue: '1.5', specUnit: 'м/с', sortOrder: 2 },
-      {
-        solutionId: solution1.id,
-        specName: 'Время работы от батареи',
-        specValue: '8',
-        specUnit: 'часов',
-        sortOrder: 3,
-      },
-      { solutionId: solution1.id, specName: 'Тип навигации', specValue: 'LiDAR + SLAM', sortOrder: 4 },
-      { solutionId: solution1.id, specName: 'Габариты', specValue: '1200x800x300', specUnit: 'мм', sortOrder: 5 },
+  // Почему guard по count: createMany не умеет upsert, повторный seed иначе дублирует specs.
+  if ((await prisma.solutionSpec.count()) === 0) {
+    await prisma.solutionSpec.createMany({
+      data: [
+        // AMR-500 Pro
+        { solutionId: solution1.id, specName: 'Грузоподъёмность', specValue: '500', specUnit: 'кг', sortOrder: 1 },
+        { solutionId: solution1.id, specName: 'Скорость', specValue: '1.5', specUnit: 'м/с', sortOrder: 2 },
+        {
+          solutionId: solution1.id,
+          specName: 'Время работы от батареи',
+          specValue: '8',
+          specUnit: 'часов',
+          sortOrder: 3,
+        },
+        { solutionId: solution1.id, specName: 'Тип навигации', specValue: 'LiDAR + SLAM', sortOrder: 4 },
+        { solutionId: solution1.id, specName: 'Габариты', specValue: '1200x800x300', specUnit: 'мм', sortOrder: 5 },
 
-      // AGV-300 Basic
-      { solutionId: solution2.id, specName: 'Грузоподъёмность', specValue: '300', specUnit: 'кг', sortOrder: 1 },
-      { solutionId: solution2.id, specName: 'Скорость', specValue: '1.0', specUnit: 'м/с', sortOrder: 2 },
-      {
-        solutionId: solution2.id,
-        specName: 'Время работы от батареи',
-        specValue: '6',
-        specUnit: 'часов',
-        sortOrder: 3,
-      },
-      { solutionId: solution2.id, specName: 'Тип навигации', specValue: 'QR-коды', sortOrder: 4 },
+        // AGV-300 Basic
+        { solutionId: solution2.id, specName: 'Грузоподъёмность', specValue: '300', specUnit: 'кг', sortOrder: 1 },
+        { solutionId: solution2.id, specName: 'Скорость', specValue: '1.0', specUnit: 'м/с', sortOrder: 2 },
+        {
+          solutionId: solution2.id,
+          specName: 'Время работы от батареи',
+          specValue: '6',
+          specUnit: 'часов',
+          sortOrder: 3,
+        },
+        { solutionId: solution2.id, specName: 'Тип навигации', specValue: 'QR-коды', sortOrder: 4 },
 
-      // Robot Arm 6X
-      { solutionId: solution3.id, specName: 'Количество осей', specValue: '6', sortOrder: 1 },
-      { solutionId: solution3.id, specName: 'Грузоподъёмность', specValue: '10', specUnit: 'кг', sortOrder: 2 },
-      { solutionId: solution3.id, specName: 'Радиус действия', specValue: '1400', specUnit: 'мм', sortOrder: 3 },
-      { solutionId: solution3.id, specName: 'Повторяемость', specValue: '±0.05', specUnit: 'мм', sortOrder: 4 },
-    ],
-  })
+        // Robot Arm 6X
+        { solutionId: solution3.id, specName: 'Количество осей', specValue: '6', sortOrder: 1 },
+        { solutionId: solution3.id, specName: 'Грузоподъёмность', specValue: '10', specUnit: 'кг', sortOrder: 2 },
+        { solutionId: solution3.id, specName: 'Радиус действия', specValue: '1400', specUnit: 'мм', sortOrder: 3 },
+        { solutionId: solution3.id, specName: 'Повторяемость', specValue: '±0.05', specUnit: 'мм', sortOrder: 4 },
+      ],
+    })
+  }
 
   // Применимость решений
+  // Почему skipDuplicates: связка solution+industry+objectType уникальна, seed должен быть идемпотентен.
   await prisma.solutionApplicability.createMany({
+    skipDuplicates: true,
     data: [
       { solutionId: solution1.id, industryId: trade.id, objectTypeId: warehouse.id, suitabilityScore: 0.95 },
       { solutionId: solution1.id, industryId: logistics.id, objectTypeId: airport.id, suitabilityScore: 0.7 },
@@ -271,6 +278,7 @@ async function main() {
 
   // Теги решений
   await prisma.solutionTag.createMany({
+    skipDuplicates: true,
     data: [
       { solutionId: solution1.id, tagId: tags[0].id }, // LiDAR
       { solutionId: solution1.id, tagId: tags[3].id }, // API
@@ -283,36 +291,40 @@ async function main() {
   // 3. ЭТАЛОННЫЕ ОБЪЕКТЫ
   // ============================================================
 
-  await prisma.benchmarkObject.create({
-    data: {
-      objectTypeId: warehouse.id,
-      name: 'Типовой склад 5000 м²',
-      description: 'Средний склад для e-commerce с 2 сменами',
+  if ((await prisma.benchmarkObject.count()) === 0) {
+    await prisma.benchmarkObject.create({
       data: {
-        area_sqm: 5000,
-        employee_count: 40,
-        shifts: 2,
-        operating_hours: 16,
-        processes: [
-          { name: 'Приёмка товара', hours_day: 8, workers: 5, cost_month: 350000 },
-          { name: 'Комплектация заказов', hours_day: 12, workers: 15, cost_month: 900000 },
-          { name: 'Инвентаризация', hours_day: 4, workers: 3, cost_month: 120000 },
-        ],
+        objectTypeId: warehouse.id,
+        name: 'Типовой склад 5000 м²',
+        description: 'Средний склад для e-commerce с 2 сменами',
+        data: {
+          area_sqm: 5000,
+          employee_count: 40,
+          shifts: 2,
+          operating_hours: 16,
+          processes: [
+            { name: 'Приёмка товара', hours_day: 8, workers: 5, cost_month: 350000 },
+            { name: 'Комплектация заказов', hours_day: 12, workers: 15, cost_month: 900000 },
+            { name: 'Инвентаризация', hours_day: 4, workers: 3, cost_month: 120000 },
+          ],
+        },
       },
-    },
-  })
+    })
+  }
 
   // ============================================================
   // 4. ПОЛЬЗОВАТЕЛИ И ПРОЕКТЫ
   // ============================================================
 
   // Тестовый пользователь
+  // Почему bcrypt-хеш вместо плейсхолдера: логин test@example.com должен реально работать.
+  const testPasswordHash = await bcrypt.hash('Test1234!', 10)
   const user = await prisma.user.upsert({
     where: { email: 'test@example.com' },
     update: {},
     create: {
       email: 'test@example.com',
-      passwordHash: '$2b$10$example_hash_not_real_password', // В реальности используйте bcrypt
+      passwordHash: testPasswordHash,
       name: 'Иван Петров',
       company: 'ООО Логистик',
       role: 'user',
@@ -320,7 +332,11 @@ async function main() {
   })
 
   // Проект пользователя
-  const project = await prisma.userProject.create({
+  // Почему guard: иначе каждый seed плодит «Мой склад в Казани».
+  let project = await prisma.userProject.findFirst({
+    where: { userId: user.id, name: 'Мой склад в Казани' },
+  })
+  project ||= await prisma.userProject.create({
     data: {
       userId: user.id,
       objectTypeId: warehouse.id,
@@ -335,70 +351,77 @@ async function main() {
   })
 
   // Бизнес-процессы проекта
-  await prisma.userProjectProcess.createMany({
-    data: [
-      {
-        projectId: project.id,
-        processName: 'Комплектация заказов',
-        currentCost: 600000,
-        currentHours: 10,
-        employeeCount: 10,
-        frequency: 'daily',
-        description: 'Сборка заказов по накладным',
-        sortOrder: 1,
-      },
-      {
-        projectId: project.id,
-        processName: 'Транспортировка грузов',
-        currentCost: 300000,
-        currentHours: 8,
-        employeeCount: 5,
-        frequency: 'daily',
-        description: 'Перемещение товаров между зонами',
-        sortOrder: 2,
-      },
-    ],
-  })
+  // Почему guard: createMany без skipDuplicates плодил бы процессы при каждом seed.
+  if ((await prisma.userProjectProcess.count({ where: { projectId: project.id } })) === 0) {
+    await prisma.userProjectProcess.createMany({
+      data: [
+        {
+          projectId: project.id,
+          processName: 'Комплектация заказов',
+          currentCost: 600000,
+          currentHours: 10,
+          employeeCount: 10,
+          frequency: 'daily',
+          description: 'Сборка заказов по накладным',
+          sortOrder: 1,
+        },
+        {
+          projectId: project.id,
+          processName: 'Транспортировка грузов',
+          currentCost: 300000,
+          currentHours: 8,
+          employeeCount: 5,
+          frequency: 'daily',
+          description: 'Перемещение товаров между зонами',
+          sortOrder: 2,
+        },
+      ],
+    })
+  }
 
   // ============================================================
   // 5. КЕЙСЫ И РЕЙТИНГИ
   // ============================================================
 
   // Кейсы внедрения
-  await prisma.caseStudy.createMany({
-    data: [
-      {
-        solutionId: solution1.id,
-        companyName: 'X5 Retail Group',
-        industryId: trade.id,
-        objectTypeId: warehouse.id,
-        title: 'Автоматизация склада в Москве',
-        description: 'Внедрение 20 роботов AMR-500 Pro на распределительном центре',
-        results: {
-          roi_months: 14,
-          savings_pct: 35,
-          productivity_increase_pct: 45,
+  // Почему guard: кейсы без уникального ключа, повторный seed дублировал бы их.
+  if ((await prisma.caseStudy.count()) === 0) {
+    await prisma.caseStudy.createMany({
+      data: [
+        {
+          solutionId: solution1.id,
+          companyName: 'X5 Retail Group',
+          industryId: trade.id,
+          objectTypeId: warehouse.id,
+          title: 'Автоматизация склада в Москве',
+          description: 'Внедрение 20 роботов AMR-500 Pro на распределительном центре',
+          results: {
+            roi_months: 14,
+            savings_pct: 35,
+            productivity_increase_pct: 45,
+          },
+          publishedAt: new Date('2024-03-15'),
         },
-        publishedAt: new Date('2024-03-15'),
-      },
-      {
-        solutionId: solution2.id,
-        companyName: 'Wildberries',
-        industryId: trade.id,
-        objectTypeId: warehouse.id,
-        title: 'AGV для сортировочного центра',
-        description: 'Развёртывание 50 AGV тележек для автоматизации сортировки',
-        results: {
-          roi_months: 18,
-          savings_pct: 28,
+        {
+          solutionId: solution2.id,
+          companyName: 'Wildberries',
+          industryId: trade.id,
+          objectTypeId: warehouse.id,
+          title: 'AGV для сортировочного центра',
+          description: 'Развёртывание 50 AGV тележек для автоматизации сортировки',
+          results: {
+            roi_months: 18,
+            savings_pct: 28,
+          },
+          publishedAt: new Date('2024-01-20'),
         },
-        publishedAt: new Date('2024-01-20'),
-      },
-    ],
-  })
+      ],
+    })
+  }
 
   // Рейтинги
   await prisma.solutionRating.createMany({
+    skipDuplicates: true,
     data: [
       {
         solutionId: solution1.id,
@@ -415,6 +438,7 @@ async function main() {
 
   // Подбор решений (заглушка)
   await prisma.projectSolutionMatch.createMany({
+    skipDuplicates: true,
     data: [
       {
         projectId: project.id,
@@ -438,8 +462,11 @@ async function main() {
   })
 
   // Экономические расчёты (заглушка)
-  await prisma.economicCalculation.create({
-    data: {
+  // Почему upsert: у расчёта уникальная связка project+solution, create дублировал бы при повторе.
+  await prisma.economicCalculation.upsert({
+    where: { projectId_solutionId: { projectId: project.id, solutionId: solution1.id } },
+    update: {},
+    create: {
       projectId: project.id,
       solutionId: solution1.id,
       initialInvestment: 2700000,

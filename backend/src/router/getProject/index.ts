@@ -1,9 +1,18 @@
 import z from 'zod'
+import { TRPCError } from '@trpc/server'
 import { trpc } from '../../lib/trpc'
+import { getActiveUserId } from '../../lib/demoUser'
 
 export const getProjectTrpcRoute = trpc.procedure
   .input(z.object({ id: z.number().int() }))
   .query(async ({ ctx, input }) => {
+    const userId = await getActiveUserId(ctx)
+    // Почему проверка владения: раньше любой проект читался по id без авторизации.
+    // Анонимные клиенты работают через демо-пользователя и видят только его проекты.
+    const owned = await ctx.prisma.userProject.findFirst({ where: { id: input.id, userId } })
+    if (!owned) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Project not found' })
+    }
     const p = await ctx.prisma.userProject.findUnique({
       where: { id: input.id },
       include: {
@@ -18,7 +27,7 @@ export const getProjectTrpcRoute = trpc.procedure
       },
     })
     if (!p) {
-      throw new Error('Project not found')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Project not found' })
     }
     return {
       ...p,

@@ -168,7 +168,13 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 - `POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB` — credentials Postgres (default `tochka_db`)
 - `DATABASE_URL` — для локального `pnpm dev` (через `localhost`)
 - `PORT` — порт backend (default `3000`)
+- `JWT_SECRET` — секрет подписи JWT, обязателен (сгенерировать: `openssl rand -base64 32`)
+- `JWT_EXPIRES_IN_SECONDS` — время жизни JWT в секундах (default `604800` = 7 дней)
 - `VITE_BACKEND_TRPC_URL` — URL tRPC, вшивается во фронт на build (default `http://localhost:3000/trpc`)
+- `VITE_BACKEND_API_URL` — URL REST-фасада `/api/*` (auth, проекты, сравнения), вшивается во фронт на build (default `http://localhost:3000/api`)
+
+> Если `.env` создан давно: докатите новые ключи из `.env.example` (`JWT_SECRET`, `JWT_EXPIRES_IN_SECONDS`, `VITE_BACKEND_API_URL`), иначе регистрация/логин упадут — backend fail-fast проверяет `JWT_SECRET` на старте.
+> Прод (`docker-compose.prod.yml`) стартует с пустой БД (только миграции, без seed) — первого пользователя создайте через `/register`.
 
 Внутри compose backend подключается к БД по `DATABASE_URL_DOCKER`
 (`postgresql://...@db:5432/...`), миграции применяются автоматически

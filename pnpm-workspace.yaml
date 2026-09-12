@@ -4,5 +4,6 @@ packages:
 allowBuilds:
   '@parcel/watcher': false
   '@prisma/engines': false
+  esbuild: true
   loodash: set this to true or false
   prisma: false

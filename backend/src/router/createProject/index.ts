@@ -1,6 +1,6 @@
 import z from 'zod'
 import { trpc } from '../../lib/trpc'
-import { getDemoUserId } from '../../lib/demoUser'
+import { getActiveUserId } from '../../lib/demoUser'
 
 const zProcessInput = z.object({
   processName: z.string().min(1),
@@ -26,7 +26,7 @@ export const createProjectTrpcRoute = trpc.procedure
     }),
   )
   .mutation(async ({ ctx, input }) => {
-    const userId = await getDemoUserId(ctx.prisma)
+    const userId = await getActiveUserId(ctx)
     const { processes, ...projectData } = input
     const project = await ctx.prisma.userProject.create({
       data: {

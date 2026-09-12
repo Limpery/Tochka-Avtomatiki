@@ -1,15 +1,19 @@
 import z from 'zod'
+import { TRPCError } from '@trpc/server'
 import { trpc } from '../../lib/trpc'
+import { getActiveUserId } from '../../lib/demoUser'
 
 export const getMatchesTrpcRoute = trpc.procedure
   .input(z.object({ projectId: z.number().int() }))
   .query(async ({ ctx, input }) => {
-    const project = await ctx.prisma.userProject.findUnique({
-      where: { id: input.projectId },
+    const userId = await getActiveUserId(ctx)
+    // Почему проверка владения: подбор раскрывает экономику чужого проекта по id.
+    const project = await ctx.prisma.userProject.findFirst({
+      where: { id: input.projectId, userId },
       include: { objectType: { select: { id: true, industryId: true } } },
     })
     if (!project) {
-      throw new Error('Project not found')
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Project not found' })
     }
 
     const applicable = await ctx.prisma.solutionApplicability.findMany({

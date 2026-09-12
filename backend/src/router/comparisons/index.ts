@@ -1,19 +1,30 @@
 import z from 'zod'
+import { TRPCError } from '@trpc/server'
 import { trpc } from '../../lib/trpc'
-import { getDemoUserId } from '../../lib/demoUser'
+import { getActiveUserId } from '../../lib/demoUser'
 
 const toNum = (v: { toNumber: () => number } | null | undefined) => (v ? v.toNumber() : null)
+
+// Почему NOT_FOUND вместо FORBIDDEN: не раскрываем, существует ли чужое сравнение.
+const notFound = () => new TRPCError({ code: 'NOT_FOUND', message: 'Comparison not found' })
 
 export const comparisonsTrpcRouter = trpc.router({
   create: trpc.procedure
     .input(z.object({ name: z.string().optional(), projectId: z.number().int().optional() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = await getDemoUserId(ctx.prisma)
+      const userId = await getActiveUserId(ctx)
+      if (input.projectId) {
+        // Почему проверяем проект: сравнение нельзя привязать к чужому проекту.
+        const owned = await ctx.prisma.userProject.findFirst({ where: { id: input.projectId, userId } })
+        if (!owned) {
+          throw notFound()
+        }
+      }
       const c = await ctx.prisma.comparison.create({ data: { ...input, userId } })
       return { id: c.id }
     }),
   list: trpc.procedure.query(async ({ ctx }) => {
-    const userId = await getDemoUserId(ctx.prisma)
+    const userId = await getActiveUserId(ctx)
     return await ctx.prisma.comparison.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -21,8 +32,9 @@ export const comparisonsTrpcRouter = trpc.router({
     })
   }),
   get: trpc.procedure.input(z.object({ id: z.number().int() })).query(async ({ ctx, input }) => {
-    const c = await ctx.prisma.comparison.findUnique({
-      where: { id: input.id },
+    const userId = await getActiveUserId(ctx)
+    const c = await ctx.prisma.comparison.findFirst({
+      where: { id: input.id, userId },
       include: {
         items: {
           orderBy: { position: 'asc' },
@@ -39,7 +51,7 @@ export const comparisonsTrpcRouter = trpc.router({
       },
     })
     if (!c) {
-      throw new Error('Comparison not found')
+      throw notFound()
     }
     return {
       ...c,
@@ -57,6 +69,11 @@ export const comparisonsTrpcRouter = trpc.router({
   addItem: trpc.procedure
     .input(z.object({ comparisonId: z.number().int(), solutionId: z.number().int() }))
     .mutation(async ({ ctx, input }) => {
+      const userId = await getActiveUserId(ctx)
+      const owned = await ctx.prisma.comparison.findFirst({ where: { id: input.comparisonId, userId } })
+      if (!owned) {
+        throw notFound()
+      }
       const count = await ctx.prisma.comparisonItem.count({
         where: { comparisonId: input.comparisonId },
       })
@@ -70,6 +87,11 @@ export const comparisonsTrpcRouter = trpc.router({
   removeItem: trpc.procedure
     .input(z.object({ comparisonId: z.number().int(), solutionId: z.number().int() }))
     .mutation(async ({ ctx, input }) => {
+      const userId = await getActiveUserId(ctx)
+      const owned = await ctx.prisma.comparison.findFirst({ where: { id: input.comparisonId, userId } })
+      if (!owned) {
+        throw notFound()
+      }
       await ctx.prisma.comparisonItem.delete({
         where: { comparisonId_solutionId: { comparisonId: input.comparisonId, solutionId: input.solutionId } },
       })

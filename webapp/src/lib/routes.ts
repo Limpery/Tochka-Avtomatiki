@@ -1,4 +1,6 @@
-export const getObjectSelectRoute = () => '/'
+export const getHomeRoute = () => '/'
+
+export const getObjectSelectRoute = () => '/new-project'
 
 export const getCatalogRoute = (params?: { industry?: string; objectType?: string }) => {
   const q = new URLSearchParams()

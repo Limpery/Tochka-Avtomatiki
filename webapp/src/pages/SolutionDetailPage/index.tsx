@@ -4,36 +4,42 @@ import { trpc } from '../../lib/trpc'
 import { getCatalogRoute, getProjectRoute } from '../../lib/routes'
 import { Segment } from '../../components/Segment'
 import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Badge } from '../../components/Badge'
+import css from './index.module.scss'
 
 const RatingForm = ({ solutionId, onRated }: { solutionId: number; onRated: () => void }) => {
   const [rating, setRating] = useState('5')
   const rate = trpc.createRating.useMutation()
   return (
-    <div>
-      <h3>Оценить</h3>
-      <select
-        value={rating}
-        onChange={(e) => {
-          setRating(e.target.value)
-        }}
-      >
-        {[1, 2, 3, 4, 5].map((n) => (
-          <option key={n} value={String(n)}>
-            {n}
-          </option>
-        ))}
-      </select>{' '}
-      <Button
-        loading={rate.isPending}
-        onClick={() => {
-          void rate.mutateAsync({ solutionId, rating: Number(rating) }).then(() => {
-            onRated()
-          })
-        }}
-      >
-        Поставить оценку
-      </Button>
-    </div>
+    <Card className={css.rateCard}>
+      <h3 className={css.sectionTitle}>Оценить решение</h3>
+      <div className={css.rateRow}>
+        <select
+          className={css.select}
+          value={rating}
+          onChange={(e) => {
+            setRating(e.target.value)
+          }}
+        >
+          {[1, 2, 3, 4, 5].map((n) => (
+            <option key={n} value={String(n)}>
+              {n}
+            </option>
+          ))}
+        </select>
+        <Button
+          loading={rate.isPending}
+          onClick={() => {
+            void rate.mutateAsync({ solutionId, rating: Number(rating) }).then(() => {
+              onRated()
+            })
+          }}
+        >
+          Поставить оценку
+        </Button>
+      </div>
+    </Card>
   )
 }
 
@@ -43,14 +49,22 @@ const CasesList = ({ solutionId }: { solutionId: number }) => {
     return null
   }
   return (
-    <div>
-      <h3>Кейсы</h3>
-      {cases.data.map((c) => (
-        <div key={c.id}>
-          <b>{c.title}</b> — {c.companyName}: {c.description} <code>{JSON.stringify(c.results)}</code>
-        </div>
-      ))}
-    </div>
+    <section>
+      <h3 className={css.sectionTitle}>Кейсы внедрений</h3>
+      <div className={css.cases}>
+        {cases.data.map((c) => (
+          <Card key={c.id}>
+            <div className={css.caseTitle}>{c.title}</div>
+            <div className={css.caseMeta}>
+              {c.companyName && <Badge tone="info">{c.companyName}</Badge>}
+              {c.industry && <Badge>{c.industry.name}</Badge>}
+              {c.objectType && <Badge>{c.objectType.name}</Badge>}
+            </div>
+            {c.description && <p className={css.caseDesc}>{c.description}</p>}
+          </Card>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -64,17 +78,27 @@ interface HeaderInfo {
   ratingsCount: number
 }
 
-const SolutionHeader = ({ info }: { info: HeaderInfo }) => {
-  const price = info.priceMin
-    ? `${info.priceMin.toLocaleString('ru-RU')}–${info.priceMax?.toLocaleString('ru-RU')} ₽`
-    : 'по запросу'
-  const rating = info.avgRating === null ? 'без оценок' : `★${info.avgRating.toFixed(1)} (${info.ratingsCount})`
-  return (
-    <div>
-      Вендор: {info.vendorName} ({info.vendorCountry}) · Категория: {info.categoryName} · Цена: {price} · {rating}
+const SolutionHeader = ({ info }: { info: HeaderInfo }) => (
+  <Card className={css.hero}>
+    <div className={css.heroPrice}>
+      {info.priceMin
+        ? `${info.priceMin.toLocaleString('ru-RU')}–${info.priceMax?.toLocaleString('ru-RU')} ₽`
+        : 'цена по запросу'}
     </div>
-  )
-}
+    <div className={css.badges}>
+      <Badge tone="info">{info.vendorName}</Badge>
+      {info.vendorCountry && <Badge>{info.vendorCountry}</Badge>}
+      {info.categoryName && <Badge tone="accent">{info.categoryName}</Badge>}
+      {info.avgRating === null ? (
+        <Badge>без оценок</Badge>
+      ) : (
+        <Badge tone="accent">
+          ★ {info.avgRating.toFixed(1)} ({info.ratingsCount})
+        </Badge>
+      )}
+    </div>
+  </Card>
+)
 
 export const SolutionDetailPage = () => {
   const { slug = '' } = useParams()
@@ -83,10 +107,10 @@ export const SolutionDetailPage = () => {
   const solution = trpc.getSolution.useQuery({ slug })
 
   if (solution.isLoading) {
-    return <div>Загрузка...</div>
+    return <div className={css.hint}>Загрузка…</div>
   }
   if (!solution.data) {
-    return <div>Решение не найдено</div>
+    return <div className={css.hint}>Решение не найдено</div>
   }
   const s = solution.data
 
@@ -103,27 +127,33 @@ export const SolutionDetailPage = () => {
           ratingsCount: s.ratingsCount,
         }}
       />
-      <h3>Характеристики</h3>
-      <table>
-        <tbody>
-          {s.specs.map((sp) => (
-            <tr key={sp.id}>
-              <td>{sp.specName}</td>
-              <td>
-                {sp.specValue} {sp.specUnit ?? ''}
-              </td>
-            </tr>
+      <section>
+        <h3 className={css.sectionTitle}>Характеристики</h3>
+        <Card className={css.tableCard}>
+          <table className={css.table}>
+            <tbody>
+              {s.specs.map((sp) => (
+                <tr key={sp.id}>
+                  <td className={css.specName}>{sp.specName}</td>
+                  <td>
+                    {sp.specValue} {sp.specUnit ?? ''}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      </section>
+      <section>
+        <h3 className={css.sectionTitle}>Применимость</h3>
+        <div className={css.badges}>
+          {s.applicability.map((a) => (
+            <Badge key={a.id} tone="success">
+              {a.industry.name} / {a.objectType?.name ?? 'вся отрасль'} — {(a.suitabilityScore * 100).toFixed(0)}%
+            </Badge>
           ))}
-        </tbody>
-      </table>
-      <h3>Применимость</h3>
-      <ul>
-        {s.applicability.map((a) => (
-          <li key={a.id}>
-            {a.industry.name} / {a.objectType?.name ?? 'вся отрасль'} — {(a.suitabilityScore * 100).toFixed(0)}%
-          </li>
-        ))}
-      </ul>
+        </div>
+      </section>
       <CasesList solutionId={s.id} />
       <RatingForm
         solutionId={s.id}
@@ -131,11 +161,15 @@ export const SolutionDetailPage = () => {
           void solution.refetch()
         }}
       />
-      <div style={{ marginTop: 12 }}>
+      <div>
         {projectId ? (
-          <Link to={getProjectRoute(projectId)}>→ К экономике проекта</Link>
+          <Link className={css.link} to={getProjectRoute(projectId)}>
+            → К экономике проекта
+          </Link>
         ) : (
-          <Link to={getCatalogRoute()}>← Назад в каталог</Link>
+          <Link className={css.link} to={getCatalogRoute()}>
+            ← Назад в каталог
+          </Link>
         )}
       </div>
     </Segment>

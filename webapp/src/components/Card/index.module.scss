@@ -1,0 +1,7 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.card {
+  @include card;
+  padding: $spaceLg;
+}

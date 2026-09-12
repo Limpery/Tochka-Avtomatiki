@@ -1,11 +1,72 @@
+// Дизайн-токены «светлой индустриальной» темы.
+// Почему SCSS-переменные, а не CSS-кастомные свойства: модули уже импортируют vars,
+// смена значения в одном месте перекрашивает всё приложение без рантайм-накладных.
+
+// --- Палитра ---
 $white: #fff;
 $black: #000;
 $blue: #00f;
 $red: #f00;
 
-$defaultFontFamily: 'Helvetica', 'Arial', sans-serif;
+// Фон и поверхности
+$bgPage: #f6f7f9;
+$bgSurface: #fff;
+$bgMuted: #eef1f6;
+
+// Текст
+$textPrimary: #1a2233;
+$textSecondary: #5b6478;
+$textOnAccent: #fff;
+
+// Акценты
+$accent: #4f46e5; // indigo — основной CTA, активные шаги
+$accentHover: #4338ca;
+$accentSoft: #eef0fe; // подложка бейджей/пилюль
+$accent2: #ea580c; // orange — вторичный акцент (KPI, подсветка лучшего)
+$accent2Soft: #fff3ea;
+
+// Семантика
+$success: #16a34a;
+$successSoft: #e8f7ee;
+$danger: #dc2626;
+$dangerSoft: #fdecec;
+$warning: #b45309;
+$warningSoft: #fdf3e3;
+
+// Границы и тени
+$border: #e3e7ee;
+$borderStrong: #c9d1de;
+$shadowCard:
+  0 1px 2px rgb(26 34 51 / 6%),
+  0 4px 16px rgb(26 34 51 / 8%);
+$shadowPop: 0 8px 32px rgb(26 34 51 / 16%);
+
+// --- Типографика ---
+$defaultFontFamily:
+  'Inter',
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  'Roboto',
+  'Helvetica',
+  'Arial',
+  sans-serif;
 $defaultFontSize: 14px;
-$defaultBacgroundColor: $white;
-$defaultTextColor: $black;
-$defaultLineHeight: 1.2;
+$defaultBacgroundColor: $bgPage;
+$defaultTextColor: $textPrimary;
+$defaultLineHeight: 1.5;
 $borderRadiusSmall: 3px;
+
+// Радиусы новой темы
+$radiusSm: 6px;
+$radiusMd: 8px;
+$radiusLg: 12px;
+$radiusPill: 999px;
+
+// --- Отступы ---
+$spaceXs: 4px;
+$spaceSm: 8px;
+$spaceMd: 12px;
+$spaceLg: 16px;
+$spaceXl: 24px;
+$space2xl: 32px;

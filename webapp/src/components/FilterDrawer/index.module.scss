@@ -1,0 +1,162 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.burger {
+  @include btn('ghost');
+  position: relative;
+}
+
+.burgerIcon {
+  font-size: 16px;
+}
+
+.burgerCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: $radiusPill;
+  background: $accent;
+  color: $textOnAccent;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(26 34 51 / 45%);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  max-width: 100vw;
+  background: $bgSurface;
+  box-shadow: $shadowPop;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in 0.2s ease-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.drawerHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spaceLg $spaceXl;
+  border-bottom: 1px solid $border;
+}
+
+.drawerTitle {
+  @include h2;
+}
+
+.close {
+  border: none;
+  background: $bgMuted;
+  color: $textSecondary;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    color: $textPrimary;
+  }
+}
+
+.drawerBody {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: $spaceLg $spaceXl;
+  display: flex;
+  flex-direction: column;
+  gap: $spaceXl;
+}
+
+.sectionTitle {
+  @include h3;
+  margin-bottom: $spaceMd;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spaceSm;
+}
+
+.pill {
+  @include pill;
+  font-size: 13px;
+  padding: 7px $spaceMd;
+
+  &.pillActive {
+    @include pillActive;
+  }
+}
+
+.select {
+  @include input;
+  width: 100%;
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceSm;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: $spaceSm;
+  font-size: 14px;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 17px;
+    height: 17px;
+    accent-color: $accent;
+    cursor: pointer;
+  }
+}
+
+.priceRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spaceMd;
+}
+
+.drawerFoot {
+  display: flex;
+  gap: $spaceMd;
+  padding: $spaceLg $spaceXl;
+  border-top: 1px solid $border;
+}

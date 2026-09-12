@@ -1,0 +1,233 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.hint {
+  color: $textSecondary;
+}
+
+.body,
+.resultSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceLg;
+}
+
+.sectionTitle {
+  @include h3;
+  margin-bottom: $spaceMd;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: $spaceMd;
+}
+
+.processes {
+  display: flex;
+  flex-direction: column;
+}
+
+.process {
+  display: flex;
+  justify-content: space-between;
+  gap: $spaceMd;
+  padding: 10px 0;
+  border-top: 1px solid $border;
+  font-size: 14px;
+}
+
+// --- Подборка ---
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $spaceMd;
+}
+
+.matchCard {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spaceSm;
+  padding: $spaceLg;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    border-color: $accent;
+  }
+
+  &.matchActive {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgb(79 70 229 / 15%);
+  }
+}
+
+.matchName {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.matchMeta {
+  font-size: 13px;
+  color: $textSecondary;
+}
+
+.link {
+  @include link;
+  font-weight: 600;
+}
+
+// --- Калькулятор ---
+.calcCard {
+  max-width: 560px;
+}
+
+.calcRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $spaceMd;
+  margin-top: $spaceMd;
+}
+
+.actions {
+  margin-top: $spaceLg;
+}
+
+// --- KPI ---
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: $spaceMd;
+}
+
+.kpi {
+  background: $bgMuted;
+  border-radius: $radiusMd;
+  padding: $spaceMd;
+}
+
+.kpiLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: $textSecondary;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpiValue {
+  margin-top: 4px;
+  font-size: 17px;
+  font-weight: 800;
+  color: $textPrimary;
+}
+
+// --- CSS-графики ---
+.charts {
+  margin-top: $spaceLg;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: $spaceLg;
+}
+
+.barBlock {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceSm;
+}
+
+.barLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: $textPrimary;
+}
+
+.barTrack {
+  height: 12px;
+  border-radius: $radiusPill;
+  background: $bgMuted;
+  overflow: hidden;
+}
+
+.barTrackCenter {
+  display: flex;
+  height: 12px;
+  border-radius: $radiusPill;
+  background: $bgMuted;
+  overflow: hidden;
+}
+
+.barHalf {
+  flex: 1 1 50%;
+  display: flex;
+
+  &:first-child {
+    justify-content: flex-end;
+  }
+}
+
+.barFill {
+  height: 100%;
+  border-radius: $radiusPill;
+  transition: width 0.4s ease;
+
+  &.good {
+    background: $success;
+  }
+
+  &.mid {
+    background: $warning;
+  }
+
+  &.bad {
+    background: $danger;
+  }
+
+  &.empty {
+    background: $borderStrong;
+  }
+}
+
+.barScale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: $textSecondary;
+}
+
+// --- Таблицы ---
+.tableCard {
+  padding: $spaceSm $spaceLg;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th {
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: $textSecondary;
+    padding: 10px $spaceSm;
+    border-bottom: 1px solid $borderStrong;
+  }
+
+  tr:not(:last-child) td {
+    border-bottom: 1px solid $border;
+  }
+
+  td {
+    padding: 10px $spaceSm;
+    vertical-align: middle;
+  }
+}

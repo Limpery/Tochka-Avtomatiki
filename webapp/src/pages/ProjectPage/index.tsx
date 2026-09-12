@@ -1,9 +1,14 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import cn from 'classnames'
 import { trpc } from '../../lib/trpc'
 import { getSimulationRoute, getSolutionRoute } from '../../lib/routes'
 import { Segment } from '../../components/Segment'
 import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Badge } from '../../components/Badge'
+import { Field } from '../../components/Field'
+import css from './index.module.scss'
 
 interface CalcResult {
   initialInvestment: number
@@ -16,13 +21,69 @@ interface CalcResult {
   npv: number
 }
 
-interface MatchItem {
-  solutionId: number
-  solutionName: string
-  solutionSlug: string
-  vendorName: string
-  matchScore: number
-  priceMin: number | null
+const formatRub = (n: number) => `${n.toLocaleString('ru-RU')} ₽`
+
+// Почему CSS, а не библиотека графиков: полоса окупаемости и шкала ROI
+// рисуются div'ами без новых зависимостей и работают при любом масштабе.
+const PaybackBar = ({ paybackMonths }: { paybackMonths: number }) => {
+  // Почему шкала 60 мес: типовой горизонт для складской роботизации, дольше — всё равно «5+ лет».
+  const pct = Math.min(100, Math.max(0, (paybackMonths / 60) * 100))
+  const tone = paybackMonths <= 0 ? 'empty' : paybackMonths <= 24 ? 'good' : paybackMonths <= 36 ? 'mid' : 'bad'
+  return (
+    <div className={css.barBlock}>
+      <div className={css.barLabel}>
+        Окупаемость: {(paybackMonths / 12).toFixed(1)} г ({paybackMonths.toFixed(1)} мес)
+      </div>
+      <div className={css.barTrack}>
+        <div className={cn(css.barFill, css[tone])} style={{ width: `${pct}%` }} />
+      </div>
+      <div className={css.barScale}>
+        <span>0</span>
+        <span>2г</span>
+        <span>3г</span>
+        <span>5+ лет</span>
+      </div>
+    </div>
+  )
+}
+
+const RoiScale = ({ roi3yr }: { roi3yr: number }) => {
+  // Почему центр на нуле: отрицательный ROI уходит влево красным, положительный — вправо зелёным.
+  const pct = Math.min(100, Math.abs(roi3yr) / 200) * 100
+  return (
+    <div className={css.barBlock}>
+      <div className={css.barLabel}>ROI 3 года: {roi3yr.toFixed(1)}%</div>
+      <div className={css.barTrackCenter}>
+        <div className={css.barHalf}>
+          {roi3yr < 0 && <div className={cn(css.barFill, css.bad)} style={{ width: `${pct}%` }} />}
+        </div>
+        <div className={css.barHalf}>
+          {roi3yr >= 0 && <div className={cn(css.barFill, css.good)} style={{ width: `${pct}%` }} />}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const KpiGrid = ({ result }: { result: CalcResult }) => {
+  const items = [
+    { label: 'CAPEX', value: formatRub(result.initialInvestment) },
+    { label: 'OPEX/год', value: formatRub(result.annualOpex) },
+    { label: 'Экономия/год', value: formatRub(result.annualSavings) },
+    { label: 'Экономия/мес', value: formatRub(result.monthlySavings) },
+    { label: 'ROI 5 лет', value: `${result.roi5yr.toFixed(1)}%` },
+    { label: 'NPV (3г)', value: formatRub(result.npv) },
+  ]
+  return (
+    <div className={css.kpiGrid}>
+      {items.map((k) => (
+        <div key={k.label} className={css.kpi}>
+          <div className={css.kpiLabel}>{k.label}</div>
+          <div className={css.kpiValue}>{k.value}</div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 const CalcSummary = ({
@@ -34,21 +95,19 @@ const CalcSummary = ({
   projectId: number
   solutionId: number
 }) => (
-  <div style={{ marginTop: 12 }}>
-    <div>CAPEX: {result.initialInvestment.toLocaleString('ru-RU')} ₽</div>
-    <div>OPEX/год: {result.annualOpex.toLocaleString('ru-RU')} ₽</div>
-    <div>Экономия/год: {result.annualSavings.toLocaleString('ru-RU')} ₽</div>
-    <div>
-      Окупаемость: {(result.paybackMonths / 12).toFixed(1)} г ({result.paybackMonths.toFixed(1)} мес)
+  <Card>
+    <h3 className={css.sectionTitle}>Результат расчёта</h3>
+    <KpiGrid result={result} />
+    <div className={css.charts}>
+      <PaybackBar paybackMonths={result.paybackMonths} />
+      <RoiScale roi3yr={result.roi3yr} />
     </div>
-    <div>
-      ROI 3 года: {result.roi3yr.toFixed(1)}% · ROI 5 лет: {result.roi5yr.toFixed(1)}%
+    <div className={css.actions}>
+      <Link className={css.link} to={getSimulationRoute(projectId, solutionId)}>
+        → Шаг 4. Визуализация работы роботов
+      </Link>
     </div>
-    <div>NPV (3г): {result.npv.toLocaleString('ru-RU')} ₽</div>
-    <div style={{ marginTop: 8 }}>
-      <Link to={getSimulationRoute(projectId, solutionId)}>→ Шаг 4. Визуализация работы роботов</Link>
-    </div>
-  </div>
+  </Card>
 )
 
 const Calculator = ({
@@ -73,23 +132,34 @@ const Calculator = ({
   }
 
   return (
-    <div>
-      <h3>Расчет</h3>
-      <label>
-        Количество{' '}
-        <input
-          value={quantity}
-          onChange={(e) => {
-            setQuantity(e.target.value)
-          }}
-          style={{ width: 60 }}
-        />
-      </label>{' '}
-      <Button loading={calc.isPending} disabled={!activeId} onClick={run}>
-        Рассчитать
-      </Button>
-    </div>
+    <Card className={css.calcCard}>
+      <h3 className={css.sectionTitle}>Расчёт экономики</h3>
+      <div className={css.calcRow}>
+        <Field label="Количество роботов">
+          <input
+            value={quantity}
+            inputMode="numeric"
+            onChange={(e) => {
+              setQuantity(e.target.value)
+            }}
+          />
+        </Field>
+        <Button loading={calc.isPending} disabled={!activeId} onClick={run}>
+          Рассчитать
+        </Button>
+      </div>
+      {!activeId && <div className={css.hint}>Выберите решение из подборки ниже</div>}
+    </Card>
   )
+}
+
+interface MatchItem {
+  solutionId: number
+  solutionName: string
+  solutionSlug: string
+  vendorName: string
+  matchScore: number
+  priceMin: number | null
 }
 
 const MatchesList = ({
@@ -103,23 +173,42 @@ const MatchesList = ({
   activeId: number | null
   onSelect: (id: number) => void
 }) => (
-  <div>
-    <h3>Подобранные решения</h3>
-    {matches.map((m) => (
-      <div key={m.solutionId} style={{ margin: '4px 0' }}>
-        <input
-          type="radio"
-          name="solution"
-          checked={activeId === m.solutionId}
-          onChange={() => {
-            onSelect(m.solutionId)
-          }}
-        />{' '}
-        <Link to={getSolutionRoute(m.solutionSlug, projectId)}>{m.solutionName}</Link> — {m.vendorName}, совпадение{' '}
-        {m.matchScore}%, цена {m.priceMin?.toLocaleString('ru-RU') ?? '—'} ₽
-      </div>
-    ))}
-  </div>
+  <section>
+    <h3 className={css.sectionTitle}>Подобранные решения</h3>
+    <div className={css.matches}>
+      {matches.map((m) => {
+        const active = activeId === m.solutionId
+        return (
+          <button
+            key={m.solutionId}
+            type="button"
+            className={cn(css.matchCard, { [css.matchActive]: active })}
+            onClick={() => {
+              onSelect(m.solutionId)
+            }}
+          >
+            <span className={css.matchName}>
+              <Link
+                className={css.link}
+                to={getSolutionRoute(m.solutionSlug, projectId)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                {m.solutionName}
+              </Link>
+            </span>
+            <span className={css.matchMeta}>
+              {m.vendorName} · {m.priceMin?.toLocaleString('ru-RU') ?? '—'} ₽
+            </span>
+            <Badge tone={m.matchScore >= 80 ? 'success' : m.matchScore >= 60 ? 'warning' : undefined}>
+              совпадение {m.matchScore}%
+            </Badge>
+          </button>
+        )
+      })}
+    </div>
+  </section>
 )
 
 interface SavedCalc {
@@ -136,18 +225,37 @@ const SavedCalculations = ({ projectId, items }: { projectId: number; items: Sav
     return null
   }
   return (
-    <div>
-      <h3>Сохраненные расчеты</h3>
-      <ul>
-        {items.map((c) => (
-          <li key={c.id}>
-            {c.solution.name}: CAPEX {c.initialInvestment?.toLocaleString('ru-RU')} ₽, окупаемость{' '}
-            {(c.paybackMonths / 12).toFixed(1)} г, ROI3 {c.roi3yr}%{' '}
-            <Link to={getSimulationRoute(projectId, c.solutionId)}>визуализация →</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <section>
+      <h3 className={css.sectionTitle}>Сохранённые расчёты</h3>
+      <Card className={css.tableCard}>
+        <table className={css.table}>
+          <thead>
+            <tr>
+              <th>Решение</th>
+              <th>CAPEX</th>
+              <th>Окупаемость</th>
+              <th>ROI 3г</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((c) => (
+              <tr key={c.id}>
+                <td>{c.solution.name}</td>
+                <td>{c.initialInvestment?.toLocaleString('ru-RU')} ₽</td>
+                <td>{(c.paybackMonths / 12).toFixed(1)} г</td>
+                <td>{c.roi3yr}%</td>
+                <td>
+                  <Link className={css.link} to={getSimulationRoute(projectId, c.solutionId)}>
+                    визуализация →
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </section>
   )
 }
 
@@ -161,26 +269,30 @@ interface ProjectInfo {
 }
 
 const ProjectSummary = ({ info }: { info: ProjectInfo }) => (
-  <div>
-    <div>
-      {info.industryName} / {info.objectTypeName} · Площадь: {info.areaSqm ?? '—'} м² · Сотрудников:{' '}
-      {info.employeeCount ?? '—'} · ФОТ: {info.monthlyFund?.toLocaleString('ru-RU') ?? '—'} ₽/мес
+  <Card>
+    <div className={css.badges}>
+      <Badge tone="info">{info.industryName}</Badge>
+      <Badge tone="accent">{info.objectTypeName}</Badge>
+      {info.areaSqm !== null && <Badge>Площадь: {info.areaSqm} м²</Badge>}
+      {info.employeeCount !== null && <Badge>Сотрудников: {info.employeeCount}</Badge>}
+      {info.monthlyFund !== null && <Badge>ФОТ: {info.monthlyFund.toLocaleString('ru-RU')} ₽/мес</Badge>}
     </div>
-    <h3>Процессы</h3>
-    <ul>
+    <h3 className={css.sectionTitle}>Процессы</h3>
+    <ul className={css.processes}>
       {info.processes.map((proc) => (
-        <li key={proc.id}>
-          {proc.processName}: {proc.currentCost?.toLocaleString('ru-RU') ?? '—'} ₽/мес
+        <li key={proc.id} className={css.process}>
+          <span>{proc.processName}</span>
+          <b>{proc.currentCost?.toLocaleString('ru-RU') ?? '—'} ₽/мес</b>
         </li>
       ))}
     </ul>
-  </div>
+  </Card>
 )
 
 const ResultSection = ({ projectId, activeId }: { projectId: number; activeId: number | null }) => {
   const [result, setResult] = useState<CalcResult | null>(null)
   return (
-    <div>
+    <div className={css.resultSection}>
       <Calculator
         projectId={projectId}
         activeId={activeId}
@@ -200,13 +312,13 @@ const ProjectBody = ({ projectId }: { projectId: number }) => {
   const matches = trpc.getMatches.useQuery({ projectId }, { enabled: projectId > 0 })
 
   if (project.isLoading || !project.data) {
-    return <div>{project.isLoading ? 'Загрузка...' : 'Проект не найден'}</div>
+    return <div className={css.hint}>{project.isLoading ? 'Загрузка…' : 'Проект не найден'}</div>
   }
   const p = project.data
   const activeId = solutionId ?? matches.data?.at(0)?.solutionId ?? null
 
   return (
-    <div>
+    <div className={css.body}>
       <ProjectSummary
         info={{
           industryName: p.objectType.industry.name,
@@ -234,7 +346,10 @@ const ProjectBody = ({ projectId }: { projectId: number }) => {
 export const ProjectPage = () => {
   const { id } = useParams()
   return (
-    <Segment title="Шаг 3. Экономика проекта">
+    <Segment
+      title="Шаг 3. Экономика проекта"
+      description="Выберите решение из подборки, укажите количество роботов и рассчитайте окупаемость."
+    >
       <ProjectBody projectId={Number(id)} />
     </Segment>
   )

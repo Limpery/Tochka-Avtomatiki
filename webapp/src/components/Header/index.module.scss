@@ -1,0 +1,96 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spaceLg;
+  padding: $spaceMd $spaceXl;
+  background: $bgSurface;
+  border-bottom: 1px solid $border;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: $spaceMd;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: $radiusMd;
+  background: linear-gradient(135deg, $accent, $accent2);
+  color: $textOnAccent;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.brandName {
+  font-weight: 800;
+  font-size: 16px;
+  color: $textPrimary;
+  white-space: nowrap;
+}
+
+.searchForm {
+  flex: 1 1 auto;
+  max-width: 560px;
+}
+
+.search {
+  @include input;
+  width: 100%;
+}
+
+.auth {
+  display: flex;
+  align-items: center;
+  gap: $spaceSm;
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.loginLink {
+  @include btn('ghost');
+  padding: 8px $spaceMd;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.registerLink {
+  @include btn('primary');
+  padding: 8px $spaceMd;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.projectsBtn {
+  @include btn('ghost');
+  padding: 8px $spaceMd;
+  font-size: 13px;
+}
+
+.profile {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: $textSecondary;
+}
+
+.logoutBtn {
+  @include btn('ghost');
+  padding: 8px $spaceMd;
+  font-size: 13px;
+}

@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { trpc } from '../../lib/trpc'
 import { Segment } from '../../components/Segment'
+import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Badge } from '../../components/Badge'
+import css from './index.module.scss'
 
 interface Bot {
   x: number
@@ -40,11 +44,12 @@ const RobotCanvas = ({ running, onSecond }: { running: boolean; onSecond: () => 
     let frames = 0
     const frame = () => {
       ctx.clearRect(0, 0, 640, 320)
-      ctx.strokeStyle = '#999'
+      // Почему цвета из темы захардкожены: canvas рисуется пикселями, SCSS-переменные туда не пробросить.
+      ctx.strokeStyle = '#c9d1de'
       for (let r = 0; r < 4; r += 1) {
         ctx.strokeRect(20, 30 + r * 70, 600, 50)
       }
-      ctx.fillStyle = '#1a73e8'
+      ctx.fillStyle = '#4f46e5'
       for (const b of bots) {
         b.x += b.dx * b.speed
         if (b.x > 600) {
@@ -71,7 +76,7 @@ const RobotCanvas = ({ running, onSecond }: { running: boolean; onSecond: () => 
     }
   }, [running])
 
-  return <canvas ref={canvasRef} width={640} height={320} style={{ border: '1px solid #333', marginTop: 8 }} />
+  return <canvas ref={canvasRef} width={640} height={320} className={css.canvas} />
 }
 
 interface KpiInfo {
@@ -86,22 +91,29 @@ const KpiBlock = ({ info }: { info: KpiInfo }) => {
   const opsDone = info.ticks * 12
   const savedSoFar = (info.monthlySavings / (30 * 24 * 60)) * info.ticks
   const payback = info.paybackMonths === null ? '—' : `${(info.paybackMonths / 12).toFixed(1)} г`
+  const items = [
+    { label: 'Операций (сим.)', value: String(opsDone) },
+    { label: 'Накоплено (сим.)', value: `${savedSoFar.toFixed(2)} ₽` },
+    { label: 'Экономия/мес', value: `${info.monthlySavings.toLocaleString('ru-RU')} ₽` },
+    { label: 'Окупаемость', value: payback },
+    { label: 'ROI 3г / 5л', value: `${info.roi3yr}% / ${info.roi5yr}%` },
+  ]
   return (
-    <div style={{ marginTop: 8 }}>
-      <div>Операций выполнено (симуляция): {opsDone}</div>
-      <div>Накопленная экономия (симуляция): {savedSoFar.toFixed(2)} ₽</div>
-      <div>Экономия/мес (расчет): {info.monthlySavings.toLocaleString('ru-RU')} ₽</div>
-      <div>Окупаемость: {payback}</div>
-      <div>
-        ROI 3г: {info.roi3yr}% · ROI 5л: {info.roi5yr}%
-      </div>
+    <div className={css.kpiGrid}>
+      {items.map((k) => (
+        <div key={k.label} className={css.kpi}>
+          <div className={css.kpiLabel}>{k.label}</div>
+          <div className={css.kpiValue}>{k.value}</div>
+        </div>
+      ))}
     </div>
   )
 }
 
 const StatusLine = ({ projectName, calcName }: { projectName: string | undefined; calcName: string | undefined }) => (
-  <div>
-    Проект: {projectName} · Расчет: {calcName ?? 'нет расчета — вернитесь на шаг 3'}
+  <div className={css.badges}>
+    <Badge tone="info">{projectName ?? 'Проект'}</Badge>
+    {calcName ? <Badge tone="success">{calcName}</Badge> : <Badge>нет расчёта — вернитесь на шаг 3</Badge>}
   </div>
 )
 
@@ -114,19 +126,19 @@ const ControlsBlock = ({
   onTick: () => void
   onToggle: () => void
 }) => (
-  <div>
+  <Card>
     <RobotCanvas running={running} onSecond={onTick} />
-    <div style={{ marginTop: 8 }}>
-      <button
-        type="button"
+    <div className={css.controls}>
+      <Button
+        variant="ghost"
         onClick={() => {
           onToggle()
         }}
       >
         {running ? 'Пауза' : 'Старт'}
-      </button>
+      </Button>
     </div>
-  </div>
+  </Card>
 )
 
 const useCalcSelection = (projectId: number, solutionId: number | undefined) => {
@@ -159,7 +171,7 @@ const SimulationBody = ({ projectId, solutionId }: { projectId: number; solution
   const data = useSimulationData(projectId, selection.calcSolutionId)
 
   return (
-    <div>
+    <div className={css.body}>
       <StatusLine projectName={selection.projectName} calcName={data.calcName} />
       <ControlsBlock
         running={running}
@@ -189,7 +201,10 @@ export const SimulationPage = () => {
   const projectId = Number(id)
   const solutionId = params.get('solutionId') ? Number(params.get('solutionId')) : undefined
   return (
-    <Segment title="Шаг 4. Визуализация работы роботов">
+    <Segment
+      title="Шаг 4. Визуализация работы роботов"
+      description="Симуляция показывает работу роботов на объекте и накопление экономии в реальном времени."
+    >
       <SimulationBody projectId={projectId} solutionId={solutionId} />
     </Segment>
   )

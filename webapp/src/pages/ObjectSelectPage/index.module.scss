@@ -1,0 +1,86 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.sectionTitle {
+  @include h3;
+  margin-bottom: $spaceMd;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spaceSm;
+}
+
+.pill {
+  @include pill;
+
+  &.pillActive {
+    @include pillActive;
+  }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: $spaceMd;
+}
+
+.pickCard {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: $spaceLg;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+
+  &:hover {
+    border-color: $accent;
+  }
+
+  &.pickCardActive {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgb(79 70 229 / 15%);
+  }
+}
+
+.pickCardName {
+  font-weight: 700;
+  color: $textPrimary;
+}
+
+.pickCardDesc {
+  font-size: 13px;
+  color: $textSecondary;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spaceMd;
+  margin-top: $spaceMd;
+}
+
+.error {
+  margin-top: $spaceMd;
+  color: $danger;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.actions {
+  margin-top: $spaceLg;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spaceMd;
+}
+
+.link {
+  @include link;
+  font-weight: 600;
+}

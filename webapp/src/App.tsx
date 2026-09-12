@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { TrpcProvider } from './lib/trpc'
 import { Layout, RequireAuth } from './components/Layout'
+import { HomeCatalogPage } from './pages/HomeCatalogPage'
 import { ObjectSelectPage } from './pages/ObjectSelectPage'
 import { CatalogPage } from './pages/CatalogPage'
 import { SolutionDetailPage } from './pages/SolutionDetailPage'
@@ -16,7 +17,8 @@ export const App = () => (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<ObjectSelectPage />} />
+          <Route path="/" element={<HomeCatalogPage />} />
+          <Route path="/new-project" element={<ObjectSelectPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/solutions/:slug" element={<SolutionDetailPage />} />
           <Route path="/login" element={<AuthPage mode="login" />} />

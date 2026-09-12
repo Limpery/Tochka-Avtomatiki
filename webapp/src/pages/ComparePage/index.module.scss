@@ -1,0 +1,67 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.hint {
+  color: $textSecondary;
+  padding: $spaceXl 0;
+}
+
+.tableCard {
+  padding: $spaceSm $spaceLg;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+
+  th {
+    text-align: left;
+    font-size: 13px;
+    color: $textPrimary;
+    background: $bgMuted;
+    padding: 12px $spaceMd;
+  }
+
+  th:first-child {
+    border-top-left-radius: $radiusMd;
+  }
+
+  th:last-child {
+    border-top-right-radius: $radiusMd;
+  }
+
+  td {
+    padding: 10px $spaceMd;
+    border-bottom: 1px solid $border;
+    vertical-align: top;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+// Почему sticky: при горизонтальном скролле названий показателей
+// первая колонка остаётся видимой.
+.sticky {
+  position: sticky;
+  left: 0;
+  background: $bgSurface;
+  font-weight: 600;
+  color: $textSecondary;
+  min-width: 160px;
+}
+
+thead .sticky {
+  background: $bgMuted;
+}
+
+.best {
+  background: $successSoft;
+  font-weight: 700;
+  color: $success;
+}

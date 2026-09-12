@@ -1,0 +1,103 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    box-shadow 0.15s ease-in-out,
+    transform 0.15s ease-in-out;
+
+  &:hover {
+    box-shadow: $shadowPop;
+    transform: translateY(-2px);
+  }
+}
+
+.imageWrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: $bgMuted;
+  overflow: hidden;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+// Почему CSS-заглушка, а не картинка: фото от вендоров придут позже,
+// плейсхолдер рисуется без ассетов и одинаков для всех решений.
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spaceSm;
+  background: linear-gradient(135deg, $bgMuted, $accentSoft);
+}
+
+.imagePlaceholderIcon {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.imagePlaceholderText {
+  font-size: 12px;
+  font-weight: 600;
+  color: $textSecondary;
+}
+
+.suitability {
+  position: absolute;
+  top: $spaceSm;
+  right: $spaceSm;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceSm;
+  padding: $spaceLg;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 15px;
+  color: $textPrimary;
+}
+
+.meta {
+  font-size: 13px;
+  color: $textSecondary;
+}
+
+.price {
+  font-size: 17px;
+  font-weight: 800;
+  color: $textPrimary;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.desc {
+  font-size: 13px;
+  color: $textSecondary;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

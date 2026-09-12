@@ -1,0 +1,100 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.hint {
+  color: $textSecondary;
+  padding: $spaceXl 0;
+}
+
+.sectionTitle {
+  @include h3;
+  margin-bottom: $spaceMd;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spaceMd $spaceXl;
+}
+
+.heroPrice {
+  font-size: 24px;
+  font-weight: 800;
+  color: $textPrimary;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tableCard {
+  padding: $spaceSm $spaceLg;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  tr:not(:last-child) {
+    border-bottom: 1px solid $border;
+  }
+
+  td {
+    padding: 10px $spaceSm;
+    vertical-align: top;
+  }
+}
+
+.specName {
+  color: $textSecondary;
+  width: 40%;
+}
+
+.cases {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spaceMd;
+}
+
+.caseTitle {
+  font-weight: 700;
+  margin-bottom: $spaceSm;
+}
+
+.caseMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: $spaceSm;
+}
+
+.caseDesc {
+  font-size: 13px;
+  color: $textSecondary;
+  line-height: 1.5;
+}
+
+.rateCard {
+  max-width: 420px;
+}
+
+.rateRow {
+  display: flex;
+  gap: $spaceMd;
+  align-items: center;
+  margin-top: $spaceMd;
+}
+
+.select {
+  @include input;
+}
+
+.link {
+  @include link;
+  font-weight: 600;
+}

@@ -5,6 +5,9 @@ import { useAuthStore } from '../../stores/authStore'
 import { getLoginRoute, getRegisterRoute } from '../../lib/routes'
 import { Segment } from '../../components/Segment'
 import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Field } from '../../components/Field'
+import css from './index.module.scss'
 
 const zCredentials = z.object({
   email: z.string().email('Введите корректный email'),
@@ -40,54 +43,58 @@ export const AuthPage = ({ mode }: { mode: 'login' | 'register' }) => {
 
   return (
     <Segment title={mode === 'login' ? 'Вход' : 'Регистрация'}>
-      <div>
-        {mode === 'register' && (
-          <label>
-            Имя{' '}
+      <Card className={css.authCard}>
+        <div className={css.form}>
+          {mode === 'register' && (
+            <Field label="Имя">
+              <input
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value)
+                }}
+              />
+            </Field>
+          )}
+          <Field label="Email">
             <input
-              value={name}
+              value={email}
+              inputMode="email"
               onChange={(e) => {
-                setName(e.target.value)
+                setEmail(e.target.value)
               }}
             />
-          </label>
-        )}{' '}
-        <label>
-          Email{' '}
-          <input
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value)
+          </Field>
+          <Field label="Пароль">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value)
+              }}
+            />
+          </Field>
+        </div>
+        {(formError ?? error) && <div className={css.error}>{formError ?? error}</div>}
+        <div className={css.actions}>
+          <Button
+            loading={pending}
+            onClick={() => {
+              void submit()
             }}
-          />
-        </label>{' '}
-        <label>
-          Пароль{' '}
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value)
-            }}
-          />
-        </label>
-      </div>
-      {(formError ?? error) && <div style={{ color: 'red' }}>{formError ?? error}</div>}
-      <div style={{ marginTop: 12 }}>
-        <Button
-          loading={pending}
-          onClick={() => {
-            void submit()
-          }}
-        >
-          {mode === 'login' ? 'Войти' : 'Создать аккаунт'}
-        </Button>{' '}
-        {mode === 'login' ? (
-          <Link to={getRegisterRoute()}>Нет аккаунта? Зарегистрироваться</Link>
-        ) : (
-          <Link to={getLoginRoute()}>Уже есть аккаунт? Войти</Link>
-        )}
-      </div>
+          >
+            {mode === 'login' ? 'Войти' : 'Создать аккаунт'}
+          </Button>
+          {mode === 'login' ? (
+            <Link className={css.link} to={getRegisterRoute()}>
+              Нет аккаунта? Зарегистрироваться
+            </Link>
+          ) : (
+            <Link className={css.link} to={getLoginRoute()}>
+              Уже есть аккаунт? Войти
+            </Link>
+          )}
+        </div>
+      </Card>
     </Segment>
   )
 }

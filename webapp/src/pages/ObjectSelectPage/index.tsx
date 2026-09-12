@@ -1,28 +1,35 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import cn from 'classnames'
 import { trpc } from '../../lib/trpc'
 import { getCatalogRoute, getProjectRoute } from '../../lib/routes'
 import { Segment } from '../../components/Segment'
 import { Button } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Field } from '../../components/Field'
+import css from './index.module.scss'
 
 const IndustryPicker = ({ selected, onSelect }: { selected: string; onSelect: (slug: string) => void }) => {
   const industries = trpc.listIndustries.useQuery()
   return (
-    <div>
-      <h3>Отрасль</h3>
-      {industries.data?.map((i) => (
-        <button
-          key={i.slug}
-          type="button"
-          onClick={() => {
-            onSelect(i.slug)
-          }}
-          style={{ fontWeight: selected === i.slug ? 'bold' : 'normal', marginRight: 8 }}
-        >
-          {i.name}
-        </button>
-      ))}
-    </div>
+    <section>
+      <h3 className={css.sectionTitle}>Отрасль</h3>
+      <div className={css.pills}>
+        {industries.data?.map((i) => (
+          <button
+            key={i.slug}
+            type="button"
+            className={cn(css.pill, { [css.pillActive]: selected === i.slug })}
+            onClick={() => {
+              onSelect(i.slug)
+            }}
+            title={i.description ?? undefined}
+          >
+            {i.name}
+          </button>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -40,21 +47,24 @@ const ObjectTypePicker = ({
     return null
   }
   return (
-    <div>
-      <h3>Тип объекта</h3>
-      {objectTypes.data?.map((o) => (
-        <button
-          key={o.id}
-          type="button"
-          onClick={() => {
-            onSelect(o.id)
-          }}
-          style={{ fontWeight: selectedId === o.id ? 'bold' : 'normal', marginRight: 8 }}
-        >
-          {o.name}
-        </button>
-      ))}
-    </div>
+    <section>
+      <h3 className={css.sectionTitle}>Тип объекта</h3>
+      <div className={css.cards}>
+        {objectTypes.data?.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            className={cn(css.pickCard, { [css.pickCardActive]: selectedId === o.id })}
+            onClick={() => {
+              onSelect(o.id)
+            }}
+          >
+            <span className={css.pickCardName}>{o.name}</span>
+            {o.description && <span className={css.pickCardDesc}>{o.description}</span>}
+          </button>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -75,21 +85,23 @@ const BenchmarkPicker = ({
     return null
   }
   return (
-    <div>
-      <h3>Эталонный объект (пример данных)</h3>
-      {benchmarks.data?.map((b: { id: number; name: string }) => (
-        <button
-          key={b.id}
-          type="button"
-          onClick={() => {
-            onSelect(b.id)
-          }}
-          style={{ fontWeight: selectedId === b.id ? 'bold' : 'normal', marginRight: 8 }}
-        >
-          {b.name}
-        </button>
-      ))}
-    </div>
+    <section>
+      <h3 className={css.sectionTitle}>Эталонный объект (пример данных)</h3>
+      <div className={css.pills}>
+        {benchmarks.data?.map((b: { id: number; name: string }) => (
+          <button
+            key={b.id}
+            type="button"
+            className={cn(css.pill, { [css.pillActive]: selectedId === b.id })}
+            onClick={() => {
+              onSelect(b.id)
+            }}
+          >
+            {b.name}
+          </button>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -135,7 +147,10 @@ export const ObjectSelectPage = () => {
   }
 
   return (
-    <Segment title="Шаг 1. Выбор отрасли и объекта">
+    <Segment
+      title="Шаг 1. Выбор отрасли и объекта"
+      description="Выберите отрасль и тип объекта, укажите параметры — платформа создаст проект и подберёт решения."
+    >
       <IndustryPicker
         selected={industrySlug}
         onSelect={(slug) => {
@@ -157,59 +172,60 @@ export const ObjectSelectPage = () => {
           setBenchmarkId(id)
         }}
       />
-      <h3>Параметры моего объекта</h3>
-      <div>
-        <label>
-          Название{' '}
-          <input
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value)
+      <Card>
+        <h3 className={css.sectionTitle}>Параметры моего объекта</h3>
+        <div className={css.formGrid}>
+          <Field label="Название">
+            <input
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+              }}
+            />
+          </Field>
+          <Field label="Площадь, м²">
+            <input
+              value={areaSqm}
+              inputMode="numeric"
+              onChange={(e) => {
+                setAreaSqm(e.target.value)
+              }}
+            />
+          </Field>
+          <Field label="Сотрудников">
+            <input
+              value={employeeCount}
+              inputMode="numeric"
+              onChange={(e) => {
+                setEmployeeCount(e.target.value)
+              }}
+            />
+          </Field>
+          <Field label="ФОТ/мес, ₽">
+            <input
+              value={monthlyFund}
+              inputMode="numeric"
+              onChange={(e) => {
+                setMonthlyFund(e.target.value)
+              }}
+            />
+          </Field>
+        </div>
+        {error && <div className={css.error}>{error}</div>}
+        <div className={css.actions}>
+          <Button
+            loading={createProject.isPending}
+            onClick={() => {
+              void submit()
             }}
-          />
-        </label>{' '}
-        <label>
-          Площадь, м²{' '}
-          <input
-            value={areaSqm}
-            onChange={(e) => {
-              setAreaSqm(e.target.value)
-            }}
-          />
-        </label>{' '}
-        <label>
-          Сотрудников{' '}
-          <input
-            value={employeeCount}
-            onChange={(e) => {
-              setEmployeeCount(e.target.value)
-            }}
-          />
-        </label>{' '}
-        <label>
-          ФОТ/мес, ₽{' '}
-          <input
-            value={monthlyFund}
-            onChange={(e) => {
-              setMonthlyFund(e.target.value)
-            }}
-          />
-        </label>
-      </div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div style={{ marginTop: 12 }}>
-        <Button
-          loading={createProject.isPending}
-          onClick={() => {
-            void submit()
-          }}
-        >
-          Создать проект и перейти к экономике
-        </Button>{' '}
-        <a href={getCatalogRoute(selectedType ? { objectType: selectedType.slug } : undefined)}>
-          Сначала посмотреть решения →
-        </a>
-      </div>
+          >
+            Создать проект и перейти к экономике
+          </Button>
+          <a className={css.link} href={getCatalogRoute(selectedType ? { objectType: selectedType.slug } : undefined)}>
+            Сначала посмотреть решения →
+          </a>
+        </div>
+      </Card>
     </Segment>
   )
 }

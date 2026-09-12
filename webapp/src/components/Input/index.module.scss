@@ -7,32 +7,28 @@
   }
 
   .label {
-    font-weight: bold;
-    margin-bottom: 2px;
-    display: block;
+    @include fieldLabel;
+    margin-bottom: $spaceXs;
   }
 
   .input {
+    @include input;
     display: block;
-    padding: 7px;
-    border: 1px solid $black;
-    border-radius: $borderRadiusSmall;
-    background-color: $white;
-    outline: none;
     width: 100%;
-    max-width: 200px;
-
-    &:focus {
-      border-color: $blue;
-    }
+    max-width: 280px;
 
     &.invalid {
-      border-color: $red;
+      border-color: $danger;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgb(220 38 38 / 12%);
+      }
     }
   }
 
   .error {
-    margin-top: 2px;
-    color: $red;
+    margin-top: $spaceXs;
+    color: $danger;
+    font-size: 13px;
   }
 }

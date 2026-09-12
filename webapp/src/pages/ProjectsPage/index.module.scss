@@ -1,0 +1,41 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.hint {
+  color: $textSecondary;
+}
+
+.link {
+  @include link;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spaceLg;
+}
+
+.projectCard {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceSm;
+}
+
+.name {
+  @include link;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.desc {
+  font-size: 13px;
+  color: $textSecondary;
+  line-height: 1.5;
+}

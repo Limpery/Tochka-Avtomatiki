@@ -1,7 +1,10 @@
 @import '../../node_modules/include-media/dist/include-media';
 @import './vars';
 
-@mixin link($color: $blue, $hoverColor: $red) {
+// Почему миксины вместо дублирования: кнопки/инпуты/карточки используются
+// в 8+ местах, единый вид правится здесь, а не поиском по страницам.
+
+@mixin link($color: $accent, $hoverColor: $accentHover) {
   color: $color;
   transition: color 0.2s ease-in-out;
 
@@ -11,12 +14,156 @@
     transition: none;
   }
 }
+
 @mixin h1 {
-  font-size: 30px;
-  font-weight: bold;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: $textPrimary;
+  letter-spacing: -0.01em;
 }
 
 @mixin h2 {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: $textPrimary;
+}
+
+@mixin h3 {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: $textPrimary;
+}
+
+// Карточка-поверхность для списков, форм и KPI.
+@mixin card {
+  background: $bgSurface;
+  border: 1px solid $border;
+  border-radius: $radiusLg;
+  box-shadow: $shadowCard;
+}
+
+// Кнопка: primary — основной CTA, ghost — вторичные действия.
+@mixin btn($variant: 'primary') {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spaceSm;
+  padding: 9px $spaceLg;
+  border-radius: $radiusMd;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+
+  @if $variant == 'primary' {
+    background: $accent;
+    color: $textOnAccent;
+
+    &:hover:not(:disabled) {
+      background: $accentHover;
+    }
+  } @else {
+    background: $bgSurface;
+    color: $accent;
+    border-color: $borderStrong;
+
+    &:hover:not(:disabled) {
+      border-color: $accent;
+      background: $accentSoft;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+}
+
+// Текстовые поля и селекты.
+@mixin input {
+  padding: 9px $spaceMd;
+  border: 1px solid $borderStrong;
+  border-radius: $radiusMd;
+  background: $bgSurface;
+  color: $textPrimary;
+  font-size: 14px;
+  line-height: 1.4;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+
+  &::placeholder {
+    color: $textSecondary;
+    opacity: 0.8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgb(79 70 229 / 15%);
+  }
+}
+
+// Пилюля-бейдж: info/success/warning/accent тоном.
+@mixin badge($bg: $bgMuted, $color: $textSecondary) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: $radiusPill;
+  background: $bg;
+  color: $color;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+// Пилюля выбора (отрасли, типы объектов): обычная и активная.
+@mixin pill {
+  padding: 8px $spaceLg;
+  border-radius: $radiusPill;
+  border: 1px solid $borderStrong;
+  background: $bgSurface;
+  color: $textPrimary;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease-in-out,
+    background 0.15s ease-in-out,
+    color 0.15s ease-in-out;
+
+  &:hover {
+    border-color: $accent;
+  }
+}
+
+@mixin pillActive {
+  background: $accent;
+  border-color: $accent;
+  color: $textOnAccent;
+}
+
+// Подпись к полям форм.
+@mixin fieldLabel {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: $textSecondary;
 }

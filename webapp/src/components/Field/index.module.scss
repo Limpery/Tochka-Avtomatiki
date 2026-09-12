@@ -1,0 +1,17 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.field {
+  @include fieldLabel;
+
+  input,
+  select,
+  textarea {
+    @include input;
+    width: 100%;
+  }
+}
+
+.label {
+  color: $textSecondary;
+}

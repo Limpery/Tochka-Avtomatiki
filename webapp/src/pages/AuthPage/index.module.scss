@@ -1,0 +1,32 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.authCard {
+  max-width: 440px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: $spaceMd;
+}
+
+.error {
+  margin-top: $spaceMd;
+  color: $danger;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.actions {
+  margin-top: $spaceLg;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spaceMd;
+}
+
+.link {
+  @include link;
+  font-weight: 600;
+}

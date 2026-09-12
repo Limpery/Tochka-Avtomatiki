@@ -2,26 +2,14 @@
 @import '../../styles/mixins';
 
 .button {
-  padding: 8px 15px;
-  color: $white;
-  background-color: #0a980a;
-  border: none;
-  font-weight: bold;
-  border-radius: $borderRadiusSmall;
-  cursor: pointer;
-  user-select: none;
+  @include btn('primary');
 
-  &:hover {
-    background-color: #21b821;
-  }
-
-  &:active {
-    background-color: #39d039;
+  &.ghost {
+    @include btn('ghost');
   }
 
   &.disabled {
+    opacity: 0.55;
     pointer-events: none;
-    background-color: #929292;
-    color: #d9d9d9;
   }
 }

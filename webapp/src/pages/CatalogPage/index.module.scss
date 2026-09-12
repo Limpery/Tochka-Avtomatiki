@@ -1,0 +1,85 @@
+@import '../../styles/vars';
+@import '../../styles/mixins';
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spaceMd;
+  align-items: center;
+}
+
+.search,
+.select {
+  @include input;
+}
+
+.search {
+  flex: 1 1 220px;
+}
+
+.select {
+  flex: 0 1 200px;
+}
+
+.hint {
+  color: $textSecondary;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $spaceLg;
+}
+
+.solutionCard {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: $spaceSm;
+  padding: $spaceLg;
+}
+
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: $spaceSm;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: $accent;
+    flex: 0 0 auto;
+    cursor: pointer;
+  }
+}
+
+.name {
+  @include link;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.meta {
+  font-size: 13px;
+  color: $textSecondary;
+}
+
+.price {
+  font-size: 17px;
+  font-weight: 800;
+  color: $textPrimary;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.desc {
+  font-size: 13px;
+  color: $textSecondary;
+  line-height: 1.5;
+}

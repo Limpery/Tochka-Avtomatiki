@@ -7,24 +7,26 @@ export const Button = ({
   onClick,
   disabled,
   type = 'button',
+  variant = 'primary',
 }: {
   children: React.ReactNode
   loading?: boolean
   onClick?: () => void | Promise<void>
   disabled?: boolean
   type?: 'button' | 'submit'
+  variant?: 'primary' | 'ghost'
 }) => {
   const isDisabled = loading || disabled
   return (
     <button
-      className={cn({ [css.button]: true, [css.disabled]: isDisabled })}
+      className={cn({ [css.button]: true, [css.disabled]: isDisabled, [css.ghost]: variant === 'ghost' })}
       type={type}
       disabled={isDisabled}
       onClick={() => {
         void onClick?.()
       }}
     >
-      {loading ? 'Submitting...' : children}
+      {loading ? 'Подождите…' : children}
     </button>
   )
 }

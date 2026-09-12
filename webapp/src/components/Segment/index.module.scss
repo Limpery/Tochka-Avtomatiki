@@ -2,7 +2,10 @@
 @import '../../styles/mixins';
 
 .segment {
-  h1.title {
+  max-width: 1080px;
+
+  h1.title,
+  h2.title {
     @include h1;
   }
 
@@ -11,11 +14,15 @@
   }
 
   .description {
-    font-size: 18px;
-    margin-top: 5px;
+    margin-top: $spaceSm;
+    color: $textSecondary;
+    font-size: 15px;
   }
 
   .content {
-    margin-top: 12px;
+    margin-top: $spaceLg;
+    display: flex;
+    flex-direction: column;
+    gap: $spaceLg;
   }
 }

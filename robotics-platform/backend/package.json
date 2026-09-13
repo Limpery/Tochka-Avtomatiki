@@ -1,0 +1,44 @@
+{
+  "name": "robotics-platform-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Backend платформы подбора роботизированных решений (Fastify + Prisma 7 + PostgreSQL)",
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx src/prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && tsx src/prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.1",
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.0",
+    "fastify": "^5.4.0",
+    "fastify-plugin": "^5.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.4",
+    "prisma": "^7.9.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}
